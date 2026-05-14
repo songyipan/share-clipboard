@@ -1,7 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { MainApp } from './pages/MainApp'
 import { FloatingBall } from './components/FloatingBall'
-import './components/FloatingBall.css'
 
 function App(): React.JSX.Element {
   return (

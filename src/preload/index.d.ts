@@ -6,6 +6,7 @@ interface FloatingBallAPI {
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
+  onFloatingBallHidden: (callback: () => void) => () => void
 }
 
 declare global {

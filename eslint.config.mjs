@@ -25,7 +25,10 @@ export default defineConfig(
     },
     rules: {
       ...eslintPluginReactHooks.configs.recommended.rules,
-      ...eslintPluginReactRefresh.configs.vite.rules
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true, allowExportNames: ['buttonVariants'] }
+      ]
     }
   },
   eslintConfigPrettier

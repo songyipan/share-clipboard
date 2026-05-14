@@ -10,7 +10,13 @@ const api = {
 
   // 监听器状态
   isListenerActive: () => ipcRenderer.invoke('listener:status'),
-  getCurrentShortcut: () => ipcRenderer.invoke('listener:shortcut')
+  getCurrentShortcut: () => ipcRenderer.invoke('listener:shortcut'),
+
+  // 监听悬浮球隐藏事件
+  onFloatingBallHidden: (callback: () => void) => {
+    ipcRenderer.on('floating:hidden', callback)
+    return () => ipcRenderer.removeListener('floating:hidden', callback)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -1,34 +1,30 @@
 import { globalShortcut, screen } from 'electron'
+import { getDefaultShortcut } from './utils/platform'
 
 type SelectionTriggerCallback = () => void
 
 let isRegistered = false
-let callback: SelectionTriggerCallback | null = null
+let currentCallback: SelectionTriggerCallback | null = null
 
-/**
- * 默认快捷键
- * macOS: Command+Shift+C
- * Windows/Linux: Ctrl+Shift+C
- */
-const DEFAULT_SHORTCUT = process.platform === 'darwin' ? 'Command+Shift+C' : 'Ctrl+Shift+C'
+const SHORTCUT = getDefaultShortcut()
 
 /**
  * 启动全局快捷键监听
  */
 export function startSelectionListener(cb: SelectionTriggerCallback): boolean {
+  currentCallback = cb
+
   if (isRegistered) {
-    callback = cb
     return true
   }
 
-  callback = cb
-
   try {
-    const success = globalShortcut.register(DEFAULT_SHORTCUT, handleShortcutPress)
+    const success = globalShortcut.register(SHORTCUT, () => {
+      if (currentCallback) currentCallback()
+    })
 
     if (success) {
       isRegistered = true
-      console.log(`Selection listener registered: ${DEFAULT_SHORTCUT}`)
     }
 
     return success
@@ -39,22 +35,13 @@ export function startSelectionListener(cb: SelectionTriggerCallback): boolean {
 }
 
 /**
- * 快捷键按下时的处理
- */
-function handleShortcutPress(): void {
-  if (callback) {
-    callback()
-  }
-}
-
-/**
  * 停止全局快捷键监听
  */
 export function stopSelectionListener(): void {
   if (isRegistered) {
-    globalShortcut.unregister(DEFAULT_SHORTCUT)
+    globalShortcut.unregister(SHORTCUT)
     isRegistered = false
-    callback = null
+    currentCallback = null
   }
 }
 
@@ -62,8 +49,7 @@ export function stopSelectionListener(): void {
  * 获取当前鼠标位置
  */
 export function getCursorPosition(): { x: number; y: number } {
-  const point = screen.getCursorScreenPoint()
-  return { x: point.x, y: point.y }
+  return screen.getCursorScreenPoint()
 }
 
 /**
@@ -77,5 +63,5 @@ export function isListenerActive(): boolean {
  * 获取当前快捷键
  */
 export function getCurrentShortcut(): string {
-  return DEFAULT_SHORTCUT
+  return SHORTCUT
 }

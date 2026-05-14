@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
     },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "80a6226e78f6d1fe464214ae0ef449d49d8ffaa3e7704f011e9b418c678ad4d1"
+    },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
@@ -15,6 +20,11 @@
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "computedHash": "3219a1944e404ffc14d1d9d6aef6dd2e3855b81387ee0a044ccbfe14d34c2357"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
     }
   }
 }
