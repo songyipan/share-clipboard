@@ -7,7 +7,8 @@ import {
   createFloatingWindow,
   showFloatingWindow,
   hideFloatingWindow,
-  loadFloatingWindowContent
+  loadFloatingWindowContent,
+  getFloatingWindow
 } from './floatingWindow'
 import {
   startSelectionListener,
@@ -99,6 +100,13 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle('listener:status', () => isListenerActive())
   ipcMain.handle('listener:shortcut', () => getCurrentShortcut())
+
+  ipcMain.handle('floating:resize', (_event, width: number, height: number) => {
+    const floatingWindow = getFloatingWindow()
+    if (floatingWindow && !floatingWindow.isDestroyed()) {
+      floatingWindow.setSize(Math.round(width), Math.round(height))
+    }
+  })
 }
 
 // This method will be called when Electron has finished

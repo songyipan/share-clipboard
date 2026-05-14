@@ -7,6 +7,7 @@ interface FloatingBallAPI {
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
   onFloatingBallHidden: (callback: () => void) => () => void
+  resizeFloatingWindow: (width: number, height: number) => Promise<void>
 }
 
 declare global {

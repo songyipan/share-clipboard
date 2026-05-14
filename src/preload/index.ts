@@ -16,7 +16,11 @@ const api = {
   onFloatingBallHidden: (callback: () => void) => {
     ipcRenderer.on('floating:hidden', callback)
     return () => ipcRenderer.removeListener('floating:hidden', callback)
-  }
+  },
+
+  // 调整悬浮球窗口大小
+  resizeFloatingWindow: (width: number, height: number) =>
+    ipcRenderer.invoke('floating:resize', width, height)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

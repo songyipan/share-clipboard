@@ -12,14 +12,16 @@ export function createFloatingWindow(): BrowserWindow {
   }
 
   floatingWindow = new BrowserWindow({
-    width: 120,
-    height: 120,
+    width: 1,
+    height: 1,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
     skipTaskbar: true,
     show: false,
+    hasShadow: false,
+    backgroundColor: '#00000000',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -69,8 +71,8 @@ export function hideFloatingWindow(): void {
  * 计算安全的窗口位置，确保不超出屏幕边界
  */
 function safePosition(x: number, y: number): { x: number; y: number } {
-  const windowWidth = 120
-  const windowHeight = 120
+  const windowWidth = floatingWindow?.getSize()[0] ?? 160
+  const windowHeight = floatingWindow?.getSize()[1] ?? 48
   const padding = 10
 
   const display = screen.getDisplayNearestPoint({ x, y })
