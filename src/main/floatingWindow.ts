@@ -34,6 +34,11 @@ export function createFloatingWindow(): BrowserWindow {
     floatingWindow = null
   })
 
+  // 点击窗口外部时自动隐藏
+  floatingWindow.on('blur', () => {
+    floatingWindow?.hide()
+  })
+
   return floatingWindow
 }
 
