@@ -279,12 +279,9 @@ interface ToolbarProps {
 }
 
 function Toolbar({
-  // activeTab,
-  // isMarkdownLike,
-  // previewMode,
   editorTheme,
   selectedLang,
-  // onPreviewModeChange,
+
   onThemeChange,
   onLangChange
 }: ToolbarProps): React.JSX.Element {
@@ -308,17 +305,7 @@ function Toolbar({
             ))}
           </SelectContent>
         </Select>
-        {/* {activeTab === 'preview' && isMarkdownLike && (
-          <Select value={previewMode} onValueChange={(v) => onPreviewModeChange(v as PreviewMode)}>
-            <SelectTrigger className="w-24 h-7 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="render">渲染</SelectItem>
-              <SelectItem value="source">源码</SelectItem>
-            </SelectContent>
-          </Select>
-        )} */}
+
         <Select value={editorTheme} onValueChange={(v) => onThemeChange(v as EditorTheme)}>
           <SelectTrigger className="w-28 h-7 text-xs">
             <SelectValue />
