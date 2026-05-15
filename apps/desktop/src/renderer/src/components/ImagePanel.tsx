@@ -1,14 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import CodeMirror from '@uiw/react-codemirror'
-import { markdown } from '@codemirror/lang-markdown'
-import { loadLanguage } from '@uiw/codemirror-extensions-langs'
-import type { Extension } from '@codemirror/state'
-import MarkdownPreview from '@uiw/react-markdown-preview'
-import { githubDark, githubLight } from '@uiw/codemirror-theme-github'
-import { xcodeDark, xcodeLight } from '@uiw/codemirror-theme-xcode'
-import { dracula } from '@uiw/codemirror-theme-dracula'
-import { vscodeDark } from '@uiw/codemirror-theme-vscode'
-import { oneDark } from '@codemirror/theme-one-dark'
+import { useEffect, useRef, useState } from 'react'
+import MDEditor from '@uiw/react-md-editor'
+import '@uiw/react-md-editor/markdown-editor.css'
+import '@uiw/react-markdown-preview/markdown.css'
 import {
   Select,
   SelectContent,
@@ -18,114 +11,54 @@ import {
 } from '@share-clipboard/ui/components/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@share-clipboard/ui/components/tabs'
 
-type EditorTheme = 'github' | 'xcode' | 'dracula' | 'vscode' | 'onedark'
+type PreviewTheme = 'light' | 'dark'
 
-interface ThemeOption {
-  label: string
-  light: Extension
-  dark: Extension
+const PREVIEW_THEMES: Record<PreviewTheme, { label: string }> = {
+  light: { label: '浅色' },
+  dark: { label: '深色' }
 }
 
-const THEMES: Record<EditorTheme, ThemeOption> = {
-  github: { label: 'GitHub', light: githubLight, dark: githubDark },
-  xcode: { label: 'Xcode', light: xcodeLight, dark: xcodeDark },
-  dracula: { label: 'Dracula', light: dracula, dark: dracula },
-  vscode: { label: 'VS Code', light: vscodeDark, dark: vscodeDark },
-  onedark: { label: 'One Dark', light: oneDark, dark: oneDark }
-}
-
-const langAliases: Record<string, string> = {
-  javascript: 'js',
-  typescript: 'ts',
-  python: 'py',
-  shell: 'bash',
-  yaml: 'yml'
-}
-
-type PreviewMode = 'render' | 'source'
-
-type LangKey =
-  | 'markdown'
-  | 'html'
-  | 'json'
-  | 'javascript'
-  | 'python'
-  | 'cpp'
-  | 'c'
-  | 'typescript'
-  | 'java'
-  | 'rust'
-  | 'go'
-  | 'php'
-  | 'ruby'
-  | 'shell'
-  | 'sql'
-  | 'yaml'
-  | 'xml'
-  | 'css'
-
-const VALID_LANGS: LangKey[] = [
-  'markdown',
-  'html',
-  'json',
-  'javascript',
-  'python',
-  'cpp',
-  'c',
-  'typescript',
-  'java',
-  'rust',
-  'go',
-  'php',
-  'ruby',
-  'shell',
-  'sql',
-  'yaml',
-  'xml',
-  'css'
+const PROGRAMMING_LANGUAGES = [
+  { value: 'plaintext', label: '纯文本' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'jsx', label: 'JSX' },
+  { value: 'tsx', label: 'TSX' },
+  { value: 'python', label: 'Python' },
+  { value: 'java', label: 'Java' },
+  { value: 'html', label: 'HTML' },
+  { value: 'css', label: 'CSS' },
+  { value: 'json', label: 'JSON' },
+  { value: 'markdown', label: 'Markdown' },
+  { value: 'bash', label: 'Bash' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'c', label: 'C' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'csharp', label: 'C#' },
+  { value: 'php', label: 'PHP' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'swift', label: 'Swift' },
+  { value: 'kotlin', label: 'Kotlin' }
 ]
 
-function isValidLangKey(key: string): key is LangKey {
-  return VALID_LANGS.includes(key as LangKey)
-}
-
-function detectLanguage(text: string): LangKey | null {
-  const trimmed = text.trim()
-  const codeBlockMatch = trimmed.match(/^```(\w+)/)
-  if (codeBlockMatch) {
-    const matched = codeBlockMatch[1] as string
-    if (isValidLangKey(matched)) return matched
-    if (matched === 'js' || matched === 'jsx') return 'javascript'
-    if (matched === 'ts' || matched === 'tsx') return 'typescript'
-    if (matched === 'py') return 'python'
-    if (matched === 'sh' || matched === 'bash') return 'shell'
-    if (matched === 'yml') return 'yaml'
-    return null
+function wrapCodeWithLanguage(text: string, language: string): string {
+  if (!text.trim()) return text
+  // 简单但更安全的清理方式
+  let cleanedText = text.trim()
+  // 检查是否有开头的 ```
+  if (cleanedText.startsWith('```')) {
+    const firstNewlineIndex = cleanedText.indexOf('\n')
+    if (firstNewlineIndex !== -1) {
+      cleanedText = cleanedText.slice(firstNewlineIndex + 1)
+    }
   }
-
-  if (trimmed.startsWith('<!DOCTYPE html>') || trimmed.startsWith('<html')) return 'html'
-  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return 'json'
-  if (trimmed.startsWith('import ') || /^(const|let|var|function|export)\s/.test(trimmed))
-    return 'javascript'
-  if (/^(def|import|from|class)\s/.test(trimmed)) return 'python'
-  if (/^(#include|int main|void|char|float|double)/.test(trimmed)) return 'cpp'
-
-  return null
-}
-
-function getLanguageExtension(text: string, manualLang?: LangKey): Extension[] {
-  const lang = manualLang || detectLanguage(text)
-  if (!lang) return [markdown()]
-
-  const loaded = loadLanguage(lang as Parameters<typeof loadLanguage>[0])
-  if (loaded) return [loaded]
-
-  if (lang === 'cpp' || lang === 'c') {
-    const cExt = loadLanguage('c')
-    if (cExt) return [cExt]
+  // 检查是否有结尾的 ```
+  if (cleanedText.endsWith('```')) {
+    cleanedText = cleanedText.slice(0, -3)
   }
-
-  return [markdown()]
+  cleanedText = cleanedText.trim()
+  return language === 'plaintext' ? cleanedText : `\`\`\`${language}\n${cleanedText}\n\`\`\``
 }
 
 function useSelectedText(): string {
@@ -159,21 +92,6 @@ function useDarkMode(): boolean {
   return isDark
 }
 
-function useMarkdownLike(text: string): boolean {
-  return useMemo(() => {
-    const trimmed = text.trim()
-    return (
-      trimmed.startsWith('#') ||
-      trimmed.includes('```') ||
-      trimmed.includes('**') ||
-      trimmed.includes('__') ||
-      trimmed.includes('|') ||
-      trimmed.includes('- ') ||
-      trimmed.includes('> ')
-    )
-  }, [text])
-}
-
 function useSyncEditWithSelected(
   lastSelectedText: string
 ): [string, React.Dispatch<React.SetStateAction<string>>] {
@@ -192,98 +110,43 @@ function useSyncEditWithSelected(
 
 interface ImagePanelState {
   activeTab: string
-  editorTheme: EditorTheme
-  previewMode: PreviewMode
-  selectedLang: LangKey | 'auto'
+  previewTheme: PreviewTheme
+  selectedLanguage: string
 }
 
 function useImagePanelState(): ImagePanelState & {
   setActiveTab: (tab: string) => void
-  setEditorTheme: (theme: EditorTheme) => void
-  setPreviewMode: (mode: PreviewMode) => void
-  setSelectedLang: (lang: LangKey | 'auto') => void
+  setPreviewTheme: (theme: PreviewTheme) => void
+  setSelectedLanguage: (lang: string) => void
 } {
   const [activeTab, setActiveTab] = useState('preview')
-  const [editorTheme, setEditorTheme] = useState<EditorTheme>('github')
-  const [previewMode, setPreviewMode] = useState<PreviewMode>('render')
-  const [selectedLang, setSelectedLang] = useState<LangKey | 'auto'>('auto')
+  const [previewTheme, setPreviewTheme] = useState<PreviewTheme>('light')
+  const [selectedLanguage, setSelectedLanguage] = useState('plaintext')
 
   return {
     activeTab,
-    editorTheme,
-    previewMode,
-    selectedLang,
+    previewTheme,
+    selectedLanguage,
     setActiveTab,
-    setEditorTheme,
-    setPreviewMode,
-    setSelectedLang
-  }
-}
-
-interface UseImagePanelDerivedProps {
-  editText: string
-  lastSelectedText: string
-  editorTheme: EditorTheme
-  selectedLang: LangKey | 'auto'
-  isDark: boolean
-}
-
-interface UseImagePanelDerivedReturn {
-  currentTheme: Extension
-  languageExts: Extension[]
-  displaySource: string
-  isMarkdownLike: boolean
-}
-
-function useImagePanelDerived({
-  editText,
-  lastSelectedText,
-  editorTheme,
-  selectedLang,
-  isDark
-}: UseImagePanelDerivedProps): UseImagePanelDerivedReturn {
-  const currentTheme = useMemo(() => {
-    const option = THEMES[editorTheme]
-    return isDark ? option.dark : option.light
-  }, [editorTheme, isDark])
-
-  const languageExts = useMemo(
-    () =>
-      getLanguageExtension(
-        editText || lastSelectedText,
-        selectedLang === 'auto' ? undefined : selectedLang
-      ),
-    [editText, lastSelectedText, selectedLang]
-  )
-
-  const displaySource = editText || lastSelectedText
-  const isMarkdownLike = useMarkdownLike(displaySource)
-
-  return {
-    currentTheme,
-    languageExts,
-    displaySource,
-    isMarkdownLike
+    setPreviewTheme,
+    setSelectedLanguage
   }
 }
 
 interface ToolbarProps {
   activeTab: string
-  isMarkdownLike: boolean
-  previewMode: PreviewMode
-  editorTheme: EditorTheme
-  selectedLang: LangKey | 'auto'
-  onPreviewModeChange: (mode: PreviewMode) => void
-  onThemeChange: (theme: EditorTheme) => void
-  onLangChange: (lang: LangKey | 'auto') => void
+  previewTheme: PreviewTheme
+  selectedLanguage: string
+  onThemeChange: (theme: PreviewTheme) => void
+  onLanguageChange: (lang: string) => void
 }
 
 function Toolbar({
-  editorTheme,
-  selectedLang,
-
+  activeTab,
+  previewTheme,
+  selectedLanguage,
   onThemeChange,
-  onLangChange
+  onLanguageChange
 }: ToolbarProps): React.JSX.Element {
   return (
     <div className="flex items-center justify-between shrink-0 gap-2">
@@ -292,95 +155,35 @@ function Toolbar({
         <TabsTrigger value="edit">编辑</TabsTrigger>
       </TabsList>
       <div className="flex items-center gap-2">
-        <Select value={selectedLang} onValueChange={(v) => onLangChange(v as LangKey | 'auto')}>
-          <SelectTrigger className="w-28 h-7 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="auto">自动检测</SelectItem>
-            {VALID_LANGS.map((lang) => (
-              <SelectItem key={lang} value={lang}>
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={editorTheme} onValueChange={(v) => onThemeChange(v as EditorTheme)}>
-          <SelectTrigger className="w-28 h-7 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(THEMES) as EditorTheme[]).map((key) => (
-              <SelectItem key={key} value={key}>
-                {THEMES[key].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {activeTab === 'preview' && (
+          <Select value={previewTheme} onValueChange={(v) => onThemeChange(v as PreviewTheme)}>
+            <SelectTrigger className="w-24 h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(PREVIEW_THEMES) as PreviewTheme[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {PREVIEW_THEMES[key].label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {activeTab === 'edit' && (
+          <Select value={selectedLanguage} onValueChange={onLanguageChange}>
+            <SelectTrigger className="w-28 h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PROGRAMMING_LANGUAGES.map((lang) => (
+                <SelectItem key={lang.value} value={lang.value}>
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
-    </div>
-  )
-}
-
-interface PreviewPaneProps {
-  source: string
-  isMarkdownLike: boolean
-  previewMode: PreviewMode
-  theme: Extension
-  languageExts: Extension[]
-}
-
-function PreviewPane({
-  source,
-  isMarkdownLike,
-  previewMode,
-  theme,
-  languageExts
-}: PreviewPaneProps): React.JSX.Element {
-  if (previewMode === 'render' && isMarkdownLike) {
-    return (
-      <div className="w-full h-full rounded-md border border-input overflow-auto">
-        <MarkdownPreview source={source} className="p-4" style={{ background: 'transparent' }} />
-      </div>
-    )
-  }
-
-  return (
-    <div className="w-full h-full rounded-md border border-input overflow-auto">
-      <CodeMirror
-        value={source}
-        height="100%"
-        theme={theme}
-        extensions={languageExts}
-        editable={false}
-        basicSetup={{ lineNumbers: true, foldGutter: true }}
-        className="h-full text-sm"
-      />
-    </div>
-  )
-}
-
-interface EditorPaneProps {
-  value: string
-  theme: Extension
-  languageExts: Extension[]
-  onChange: (value: string) => void
-}
-
-function EditorPane({ value, theme, languageExts, onChange }: EditorPaneProps): React.JSX.Element {
-  return (
-    <div className="w-full h-full rounded-md border border-input overflow-hidden">
-      <CodeMirror
-        value={value}
-        height="100%"
-        theme={theme}
-        extensions={languageExts}
-        onChange={(v) => onChange(v)}
-        basicSetup={{ lineNumbers: true, foldGutter: true }}
-        className="h-full text-sm"
-        placeholder="在此编辑内容..."
-      />
     </div>
   )
 }
@@ -390,38 +193,16 @@ export function ImagePanel(): React.JSX.Element {
   const [editText, setEditText] = useSyncEditWithSelected(lastSelectedText)
   const state = useImagePanelState()
   const isDark = useDarkMode()
-  const derived = useImagePanelDerived({
-    editText,
-    lastSelectedText,
-    editorTheme: state.editorTheme,
-    selectedLang: state.selectedLang,
-    isDark
-  })
 
-  const handleLangChange = (lang: LangKey | 'auto'): void => {
-    state.setSelectedLang(lang)
+  const colorMode = state.activeTab === 'preview' ? state.previewTheme : isDark ? 'dark' : 'light'
 
-    if (lang === 'auto') return
-
-    const alias = langAliases[lang] || lang
-    const trimmed = editText.trim()
-
-    // 检查是否已经有代码块包裹
-    const codeBlockRegex = /^```(\w+)?\s*([\s\S]*?)\s*```$/
-    const match = trimmed.match(codeBlockRegex)
-
-    if (match) {
-      // 替换现有代码块的语言标识
-      const content = match[2] || trimmed
-      setEditText(`\`\`\`${alias}\n${content}\n\`\`\``)
-    } else {
-      // 包裹新代码块
-      setEditText(`\`\`\`${alias}\n${trimmed}\n\`\`\``)
-    }
+  const handleLanguageChange = (language: string): void => {
+    state.setSelectedLanguage(language)
+    setEditText(wrapCodeWithLanguage(editText || lastSelectedText, language))
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-background">
+    <div className="w-full h-full flex flex-col bg-background" data-color-mode={colorMode}>
       <div
         className="flex items-center h-10 px-3 pt-2 shrink-0"
         style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
@@ -434,30 +215,32 @@ export function ImagePanel(): React.JSX.Element {
         >
           <Toolbar
             activeTab={state.activeTab}
-            isMarkdownLike={derived.isMarkdownLike}
-            previewMode={state.previewMode}
-            editorTheme={state.editorTheme}
-            selectedLang={state.selectedLang}
-            onPreviewModeChange={state.setPreviewMode}
-            onThemeChange={state.setEditorTheme}
-            onLangChange={handleLangChange}
+            previewTheme={state.previewTheme}
+            selectedLanguage={state.selectedLanguage}
+            onThemeChange={state.setPreviewTheme}
+            onLanguageChange={handleLanguageChange}
           />
           <TabsContent value="preview" className="flex-1 min-h-0 mt-2">
-            <PreviewPane
-              source={derived.displaySource}
-              isMarkdownLike={derived.isMarkdownLike}
-              previewMode={state.previewMode}
-              theme={derived.currentTheme}
-              languageExts={derived.languageExts}
-            />
+            <div className="w-full h-full rounded-md border border-input overflow-auto">
+              <MDEditor.Markdown
+                source={editText || lastSelectedText}
+                className="p-4 !bg-transparent"
+                style={{ background: 'transparent' }}
+              />
+            </div>
           </TabsContent>
           <TabsContent value="edit" className="flex-1 min-h-0 mt-2">
-            <EditorPane
-              value={editText}
-              theme={derived.currentTheme}
-              languageExts={derived.languageExts}
-              onChange={setEditText}
-            />
+            <div className="w-full h-full rounded-md border border-input overflow-hidden">
+              <MDEditor
+                value={editText}
+                onChange={(v) => setEditText(v || '')}
+                height="100%"
+                preview="edit"
+                hideToolbar
+                visibleDragbar={false}
+                style={{ background: 'transparent' }}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

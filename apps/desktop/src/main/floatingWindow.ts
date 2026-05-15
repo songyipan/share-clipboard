@@ -22,6 +22,7 @@ export function createFloatingWindow(): BrowserWindow {
     show: false,
     hasShadow: false,
     backgroundColor: '#00000000',
+    type: 'toolbar',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
