@@ -1,0 +1,21 @@
+import { usePanelType } from '../hooks/usePanelType'
+import { SearchPanel } from '../components/SearchPanel'
+import { NotebookPanel } from '../components/NoteBookPanel'
+import { ImagePanel } from '../components/ImagePanel'
+import { PANEL_TYPES } from '../utils/panel'
+
+export function PanelPage(): React.JSX.Element {
+  const panelType = usePanelType()
+
+  const renderPanel = (): React.JSX.Element => {
+    if (panelType === PANEL_TYPES.NOTEBOOK) return <NotebookPanel />
+    if (panelType === PANEL_TYPES.IMAGE) return <ImagePanel />
+    return <SearchPanel />
+  }
+
+  return (
+    <div style={{ background: 'transparent', height: '100vh', padding: '8px' }}>
+      {renderPanel()}
+    </div>
+  )
+}

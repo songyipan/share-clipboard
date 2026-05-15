@@ -64,7 +64,12 @@ export function showPanelWindow(
   panelWindow.setPosition(bounds.x, bounds.y)
 
   // 确保 webContents 准备好后发送 IPC
-  console.log('[PanelWindow] showPanelWindow called, type:', type, 'isLoading:', panelWindow.webContents.isLoading())
+  console.log(
+    '[PanelWindow] showPanelWindow called, type:',
+    type,
+    'isLoading:',
+    panelWindow.webContents.isLoading()
+  )
   if (panelWindow.webContents.isLoading()) {
     panelWindow.webContents.once('did-finish-load', () => {
       console.log('[PanelWindow] did-finish-load, sending IPC with type:', type)
