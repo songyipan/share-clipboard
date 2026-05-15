@@ -17,7 +17,10 @@ export const IPC_CHANNELS = {
   SELECTION_RESULT: 'selection:result',
   FLOATING_SHOW: 'floating:show',
   FLOATING_HIDE: 'floating:hide',
+  FLOATING_RESIZE: 'floating:resize',
   SELECTION_GET: 'selection:get',
   LISTENER_STATUS: 'listener:status',
-  LISTENER_SHORTCUT: 'listener:shortcut'
+  LISTENER_SHORTCUT: 'listener:shortcut',
+  PANEL_SHOW: 'panel:show',
+  PANEL_HIDE: 'panel:hide'
 } as const

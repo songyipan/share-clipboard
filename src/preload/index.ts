@@ -8,6 +8,10 @@ const api = {
   hideFloatingBall: () => ipcRenderer.invoke('floating:hide'),
   getSelectedText: () => ipcRenderer.invoke('selection:get'),
 
+  // 面板相关
+  showPanel: () => ipcRenderer.invoke('panel:show'),
+  hidePanel: () => ipcRenderer.invoke('panel:hide'),
+
   // 监听器状态
   isListenerActive: () => ipcRenderer.invoke('listener:status'),
   getCurrentShortcut: () => ipcRenderer.invoke('listener:shortcut'),

@@ -34,11 +34,6 @@ export function createFloatingWindow(): BrowserWindow {
     floatingWindow = null
   })
 
-  // 点击窗口外部时自动隐藏
-  floatingWindow.on('blur', () => {
-    floatingWindow?.hide()
-  })
-
   return floatingWindow
 }
 
@@ -87,6 +82,15 @@ function safePosition(x: number, y: number): { x: number; y: number } {
   const safeY = Math.min(Math.max(y, padding), height - windowHeight - padding)
 
   return { x: safeX, y: safeY }
+}
+
+/**
+ * 设置悬浮球窗口的 blur 处理器
+ */
+export function setFloatingWindowBlurHandler(handler: () => void): void {
+  if (floatingWindow && !floatingWindow.isDestroyed()) {
+    floatingWindow.on('blur', handler)
+  }
 }
 
 /**

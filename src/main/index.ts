@@ -8,8 +8,16 @@ import {
   showFloatingWindow,
   hideFloatingWindow,
   loadFloatingWindowContent,
-  getFloatingWindow
+  getFloatingWindow,
+  setFloatingWindowBlurHandler
 } from './floatingWindow'
+import {
+  createPanelWindow,
+  showPanelWindow,
+  hidePanelWindow,
+  loadPanelWindowContent,
+  getPanelWindow
+} from './panelWindow'
 import {
   startSelectionListener,
   stopSelectionListener,
@@ -56,6 +64,17 @@ function createWindow(): void {
 function initializeFloatingBall(): void {
   createFloatingWindow()
   loadFloatingWindowContent()
+  createPanelWindow()
+  loadPanelWindowContent()
+
+  // 设置悬浮球 blur 处理器：当 Panel 可见时不隐藏悬浮球
+  setFloatingWindowBlurHandler(() => {
+    const panelWindow = getPanelWindow()
+    const isPanelVisible = panelWindow && !panelWindow.isDestroyed() && panelWindow.isVisible()
+    if (!isPanelVisible) {
+      hideFloatingWindow()
+    }
+  })
 
   startSelectionListener(handleSelectionTrigger)
 }
@@ -74,12 +93,12 @@ async function handleSelectionTrigger(): Promise<void> {
 }
 
 /**
- * 通知渲染进程选中的文本
+ * 通知悬浮球窗口选中的文本
  */
 function notifyRenderer(result: SelectionResult): void {
-  const window = BrowserWindow.getAllWindows()[0]
-  if (window && !window.isDestroyed()) {
-    window.webContents.send('selection:result', result)
+  const floatingWindow = getFloatingWindow()
+  if (floatingWindow && !floatingWindow.isDestroyed()) {
+    floatingWindow.webContents.send('selection:result', result)
   }
 }
 
@@ -108,6 +127,18 @@ function registerIpcHandlers(): void {
     if (floatingWindow && !floatingWindow.isDestroyed()) {
       floatingWindow.setSize(Math.round(width), Math.round(height))
     }
+  })
+
+  ipcMain.handle('panel:show', () => {
+    const floatingWindow = getFloatingWindow()
+    if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
+      const [x, y] = floatingWindow.getPosition()
+      showPanelWindow(x, y)
+    }
+  })
+
+  ipcMain.handle('panel:hide', () => {
+    hidePanelWindow()
   })
 }
 

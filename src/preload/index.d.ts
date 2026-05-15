@@ -4,6 +4,8 @@ interface FloatingBallAPI {
   showFloatingBall: (text: string) => Promise<void>
   hideFloatingBall: () => Promise<void>
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
+  showPanel: () => Promise<void>
+  hidePanel: () => Promise<void>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
   onFloatingBallHidden: (callback: () => void) => () => void

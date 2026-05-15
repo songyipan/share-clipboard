@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from './ui/button'
-import { Search, Languages, ImageIcon, GripVertical } from 'lucide-react'
+import { Search, NotebookText, ImageIcon, GripVertical } from 'lucide-react'
 
 interface SelectionResult {
   success: boolean
@@ -11,12 +11,11 @@ interface SelectionResult {
 const IPC_CHANNEL = 'selection:result'
 
 export function FloatingBall(): React.JSX.Element {
-  const [text, setText] = useState<string>('')
   const [visible, setVisible] = useState<boolean>(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handler = createSelectionHandler(setText, setVisible)
+    const handler = createSelectionHandler(setVisible)
     window.electron.ipcRenderer.on(IPC_CHANNEL, handler)
 
     return () => {
@@ -31,14 +30,15 @@ export function FloatingBall(): React.JSX.Element {
     return cleanup
   }, [])
 
-  const handleAction = (action: string): void => {
-    console.log(`${action}: ${text}`)
+  const handleAction = (action: number): void => {
+    if (action === 2) {
+      window.api.showPanel()
+    }
   }
 
   const resizeWindow = useCallback((): void => {
     if (containerRef.current) {
       const { offsetWidth, offsetHeight } = containerRef.current
-      // 给阴影留出空间，底部需要更多空间
       const shadowPaddingX = 8
       const shadowPaddingY = 12
       window.api.resizeFloatingWindow(
@@ -53,6 +53,7 @@ export function FloatingBall(): React.JSX.Element {
       const timer = setTimeout(resizeWindow, 0)
       return () => clearTimeout(timer)
     }
+    return undefined
   }, [visible, resizeWindow])
 
   if (!visible) return <></>
@@ -92,7 +93,7 @@ export function FloatingBall(): React.JSX.Element {
             variant="ghost"
             size="icon-sm"
             className="rounded-full"
-            onClick={() => handleAction('搜索')}
+            onClick={() => handleAction(0)}
           >
             <Search className="size-4" />
           </Button>
@@ -100,15 +101,15 @@ export function FloatingBall(): React.JSX.Element {
             variant="ghost"
             size="icon-sm"
             className="rounded-full"
-            onClick={() => handleAction('翻译')}
+            onClick={() => handleAction(1)}
           >
-            <Languages className="size-4" />
+            <NotebookText className="size-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon-sm"
             className="rounded-full"
-            onClick={() => handleAction('图片')}
+            onClick={() => handleAction(2)}
           >
             <ImageIcon className="size-4" />
           </Button>
@@ -119,12 +120,10 @@ export function FloatingBall(): React.JSX.Element {
 }
 
 function createSelectionHandler(
-  setText: (text: string) => void,
   setVisible: (visible: boolean) => void
 ): (_event: Electron.IpcRendererEvent, result: SelectionResult) => void {
   return (_event, result: SelectionResult) => {
     if (result.success) {
-      setText(result.text)
       setVisible(true)
     }
   }
