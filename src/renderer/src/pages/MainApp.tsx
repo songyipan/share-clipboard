@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  MousePointer,
+  // MousePointer,
   Sparkles,
   Activity,
   Command,
@@ -33,20 +33,20 @@ export function MainApp(): React.JSX.Element {
             使用指南
           </h2>
           <div className="grid gap-3">
-            <GuideStep
+            {/* <GuideStep
               step={1}
               icon={<MousePointer className="w-4 h-4" aria-hidden="true" />}
               title="划选文本"
               description="在任意应用中选中想要处理的文字"
-            />
+            /> */}
             <GuideStep
-              step={2}
+              step={1}
               icon={<Command className="w-4 h-4" aria-hidden="true" />}
               title="触发快捷键"
               description={`按下 ${shortcut || '⌘⇧C'} 唤起悬浮球`}
             />
             <GuideStep
-              step={3}
+              step={2}
               icon={<Sparkles className="w-4 h-4" aria-hidden="true" />}
               title="选择功能"
               description="点击搜索、翻译或图片识别按钮"

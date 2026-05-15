@@ -26,9 +26,12 @@ import {
   getCurrentShortcut
 } from './mouseListener'
 import { captureSelection, SelectionResult } from './selection'
+import { createTray, destroyTray } from './tray'
 
-function createWindow(): void {
-  const mainWindow = new BrowserWindow({
+let mainWindow: BrowserWindow | null = null
+
+function createWindow(): BrowserWindow {
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -43,7 +46,11 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
+  })
+
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -56,6 +63,8 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  return mainWindow
 }
 
 /**
@@ -146,20 +155,41 @@ function registerIpcHandlers(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+/**
+ * 显示主窗口（用于托盘点击）
+ */
+function showMainWindow(): void {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    mainWindow.show()
+    mainWindow.focus()
+  } else {
+    createWindow()
+  }
+}
+
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // macOS: 隐藏 Dock 图标，只在托盘显示
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.hide()
+  }
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
   registerIpcHandlers()
-  createWindow()
+  // 启动时不创建主窗口，只创建托盘和悬浮球
   initializeFloatingBall()
+  createTray(showMainWindow)
 
   app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    // macOS 点击 Dock 图标时显示主窗口（但 Dock 已隐藏，所以这个不会触发）
+    showMainWindow()
   })
 })
 
@@ -168,6 +198,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   stopSelectionListener()
+  destroyTray()
 
   if (process.platform !== 'darwin') {
     app.quit()
