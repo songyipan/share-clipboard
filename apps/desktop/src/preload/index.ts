@@ -34,7 +34,10 @@ const api = {
 
   // 调整悬浮球窗口大小
   resizeFloatingWindow: (width: number, height: number) =>
-    ipcRenderer.invoke('floating:resize', width, height)
+    ipcRenderer.invoke('floating:resize', width, height),
+
+  // 获取最后一次选中的文本
+  getLastSelectedText: () => ipcRenderer.invoke('selection:last')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

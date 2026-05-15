@@ -11,6 +11,7 @@ interface FloatingBallAPI {
   onFloatingBallHidden: (callback: () => void) => () => void
   onPanelType: (callback: (type: string) => void) => () => void
   resizeFloatingWindow: (width: number, height: number) => Promise<void>
+  getLastSelectedText: () => Promise<string>
 }
 
 declare global {

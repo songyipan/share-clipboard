@@ -91,11 +91,17 @@ function initializeFloatingBall(): void {
 /**
  * 处理划词触发
  */
+let lastSelectionText: string = ''
 async function handleSelectionTrigger(): Promise<void> {
   const position = getCursorPosition()
   const result = await captureSelection()
 
   if (result.success) {
+    // 防止同一文本重复触发
+    if (result.text === lastSelectionText) {
+      return
+    }
+    lastSelectionText = result.text || ''
     showFloatingWindow(position.x, position.y)
     notifyRenderer(result)
   }
@@ -119,6 +125,11 @@ function registerIpcHandlers(): void {
     const position = getCursorPosition()
     showFloatingWindow(position.x, position.y)
   })
+
+  /**
+   * 获取最后一次选中的文本
+   */
+  ipcMain.handle('selection:last', () => lastSelectionText)
 
   ipcMain.handle('floating:hide', () => {
     hideFloatingWindow()
