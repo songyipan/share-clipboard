@@ -1,0 +1,24 @@
+{
+  "name": "share-clipboard-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "dev:desktop": "turbo run dev --filter @share-clipboard/desktop",
+    "dev:web": "turbo run dev --filter @share-clipboard/web"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "pnpm@10.11.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
+  }
+}

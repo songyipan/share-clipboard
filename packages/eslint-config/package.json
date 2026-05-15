@@ -1,0 +1,16 @@
+{
+  "name": "@share-clipboard/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "base.js",
+    "nextjs.js",
+    "react.js"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "eslint": "^9"
+  }
+}
