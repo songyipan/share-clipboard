@@ -1,3 +1,4 @@
-@import '@share-clipboard/styles';
+@import "@share-clipboard/ui/globals.css";
 
-/* Web-specific styles can be added here */
+@source "../**/*.{ts,tsx}";
+@source "../../../packages/ui/src/**/*.{ts,tsx}";

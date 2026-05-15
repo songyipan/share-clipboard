@@ -1,2 +1,2 @@
 // Re-export from shared UI package
-export { Button, buttonVariants, type ButtonVariantProps } from '@share-clipboard/ui'
+export { Button, buttonVariants } from '@share-clipboard/ui/components/button'
