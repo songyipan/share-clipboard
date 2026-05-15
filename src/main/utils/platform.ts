@@ -22,5 +22,6 @@ export const IPC_CHANNELS = {
   LISTENER_STATUS: 'listener:status',
   LISTENER_SHORTCUT: 'listener:shortcut',
   PANEL_SHOW: 'panel:show',
-  PANEL_HIDE: 'panel:hide'
+  PANEL_HIDE: 'panel:hide',
+  PANEL_TYPE: 'panel:type'
 } as const

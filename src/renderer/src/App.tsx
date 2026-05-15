@@ -1,7 +1,10 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { MainApp } from './pages/MainApp'
 import { FloatingBall } from './components/FloatingBall'
-import { Panel } from './components/Panel'
+import { SearchPanel } from './components/SearchPanel'
+import { NotebookPanel } from './components/NoteBookPanel'
+import { ImagePanel } from './components/ImagePanel'
 
 function App(): React.JSX.Element {
   return (
@@ -24,9 +27,27 @@ function FloatingBallPage(): React.JSX.Element {
 }
 
 function PanelPage(): React.JSX.Element {
+  const [panelType, setPanelType] = useState<string>('search')
+
+  useEffect(() => {
+    const cleanup = window.api.onPanelType((type) => {
+      console.log('[PanelPage] Received panel type:', type)
+      setPanelType(type)
+    })
+    return cleanup
+  }, [])
+
+  console.log('[PanelPage] Current panelType:', panelType)
+
+  const renderPanel = (): React.JSX.Element => {
+    if (panelType === 'notebook') return <NotebookPanel />
+    if (panelType === 'image') return <ImagePanel />
+    return <SearchPanel />
+  }
+
   return (
     <div style={{ background: 'transparent', height: '100vh', padding: '8px' }}>
-      <Panel />
+      {renderPanel()}
     </div>
   )
 }

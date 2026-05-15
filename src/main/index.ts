@@ -129,11 +129,12 @@ function registerIpcHandlers(): void {
     }
   })
 
-  ipcMain.handle('panel:show', () => {
+  ipcMain.handle('panel:show', (_event, type: string) => {
+    console.log('[Main] panel:show received, type:', type)
     const floatingWindow = getFloatingWindow()
     if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
       const [x, y] = floatingWindow.getPosition()
-      showPanelWindow(x, y)
+      showPanelWindow(x, y, type)
     }
   })
 

@@ -1,5 +1,6 @@
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
+import { IPC_CHANNELS } from './utils/platform'
 
 let panelWindow: BrowserWindow | null = null
 
@@ -46,7 +47,11 @@ export function getPanelWindow(): BrowserWindow | null {
 /**
  * 显示面板在悬浮球右侧
  */
-export function showPanelWindow(floatingX: number, floatingY: number): void {
+export function showPanelWindow(
+  floatingX: number,
+  floatingY: number,
+  type: string = 'search'
+): void {
   if (!panelWindow || panelWindow.isDestroyed()) {
     panelWindow = createPanelWindow()
     loadPanelWindowContent()
@@ -57,6 +62,19 @@ export function showPanelWindow(floatingX: number, floatingY: number): void {
 
   const bounds = safePosition(floatingX + panelWidth + gap, floatingY)
   panelWindow.setPosition(bounds.x, bounds.y)
+
+  // 确保 webContents 准备好后发送 IPC
+  console.log('[PanelWindow] showPanelWindow called, type:', type, 'isLoading:', panelWindow.webContents.isLoading())
+  if (panelWindow.webContents.isLoading()) {
+    panelWindow.webContents.once('did-finish-load', () => {
+      console.log('[PanelWindow] did-finish-load, sending IPC with type:', type)
+      panelWindow?.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+    })
+  } else {
+    console.log('[PanelWindow] sending IPC immediately with type:', type)
+    panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+  }
+
   panelWindow.show()
 }
 

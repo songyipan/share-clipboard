@@ -9,8 +9,18 @@ const api = {
   getSelectedText: () => ipcRenderer.invoke('selection:get'),
 
   // 面板相关
-  showPanel: () => ipcRenderer.invoke('panel:show'),
+  showPanel: (type: string) => ipcRenderer.invoke('panel:show', type),
   hidePanel: () => ipcRenderer.invoke('panel:hide'),
+
+  // 监听面板类型
+  onPanelType: (callback: (type: string) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, type: string): void => {
+      console.log('[Preload] panel:type received:', type)
+      callback(type)
+    }
+    ipcRenderer.on('panel:type', handler)
+    return () => ipcRenderer.removeListener('panel:type', handler)
+  },
 
   // 监听器状态
   isListenerActive: () => ipcRenderer.invoke('listener:status'),

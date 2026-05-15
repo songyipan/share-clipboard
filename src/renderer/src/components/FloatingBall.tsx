@@ -31,9 +31,13 @@ export function FloatingBall(): React.JSX.Element {
   }, [])
 
   const handleAction = (action: number): void => {
-    if (action === 2) {
-      window.api.showPanel()
+    const types: Record<number, string> = {
+      0: 'search',
+      1: 'notebook',
+      2: 'image'
     }
+    const type = types[action] ?? 'search'
+    window.api.showPanel(type)
   }
 
   const resizeWindow = useCallback((): void => {
