@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from 'electron'
+import { BrowserWindow } from 'electron'
 import { join } from 'path'
 import { IPC_CHANNELS } from './utils/platform'
 
@@ -13,8 +13,8 @@ export function createPanelWindow(): BrowserWindow {
   }
 
   panelWindow = new BrowserWindow({
-    width: 420,
-    height: 440,
+    width: 920,
+    height: 640,
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 12, y: 12 },
     transparent: false,
@@ -57,11 +57,8 @@ export function showPanelWindow(
     loadPanelWindowContent()
   }
 
-  const panelWidth = panelWindow.getSize()[0]
-  const gap = 8
-
-  const bounds = safePosition(floatingX + panelWidth + gap, floatingY)
-  panelWindow.setPosition(bounds.x, bounds.y)
+  // 居中显示
+  panelWindow.center()
 
   // 确保 webContents 准备好后发送 IPC
   console.log(
@@ -95,19 +92,19 @@ export function hidePanelWindow(): void {
 /**
  * 计算安全的窗口位置，确保不超出屏幕边界
  */
-function safePosition(x: number, y: number): { x: number; y: number } {
-  const windowWidth = panelWindow?.getSize()[0] ?? 320
-  const windowHeight = panelWindow?.getSize()[1] ?? 240
-  const padding = 10
+// function safePosition(x: number, y: number): { x: number; y: number } {
+//   const windowWidth = panelWindow?.getSize()[0] ?? 320
+//   const windowHeight = panelWindow?.getSize()[1] ?? 240
+//   const padding = 10
 
-  const display = screen.getDisplayNearestPoint({ x, y })
-  const { width, height } = display.workAreaSize
+//   const display = screen.getDisplayNearestPoint({ x, y })
+//   const { width, height } = display.workAreaSize
 
-  const safeX = Math.min(Math.max(x, padding), width - windowWidth - padding)
-  const safeY = Math.min(Math.max(y, padding), height - windowHeight - padding)
+//   const safeX = Math.min(Math.max(x, padding), width - windowWidth - padding)
+//   const safeY = Math.min(Math.max(y, padding), height - windowHeight - padding)
 
-  return { x: safeX, y: safeY }
-}
+//   return { x: safeX, y: safeY }
+// }
 
 /**
  * 加载面板窗口内容
