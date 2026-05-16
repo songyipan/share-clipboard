@@ -22,7 +22,7 @@ export function createFloatingWindow(): BrowserWindow {
     show: false,
     hasShadow: false,
     backgroundColor: '#00000000',
-    type: 'toolbar',
+    // 移除 type: 'toolbar'，避免可能的问题
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -30,6 +30,9 @@ export function createFloatingWindow(): BrowserWindow {
       contextIsolation: true
     }
   })
+
+  // 设置窗口在所有工作区可见
+  floatingWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
 
   floatingWindow.on('closed', () => {
     floatingWindow = null
@@ -51,12 +54,15 @@ export function getFloatingWindow(): BrowserWindow | null {
 export function showFloatingWindow(x: number, y: number): void {
   if (!floatingWindow || floatingWindow.isDestroyed()) {
     floatingWindow = createFloatingWindow()
+    loadFloatingWindowContent()
   }
 
   // 确保窗口在屏幕可视范围内
   const bounds = safePosition(x, y)
   floatingWindow.setPosition(bounds.x, bounds.y)
-  floatingWindow.show()
+
+  // 只显示不聚焦，避免切换桌面
+  floatingWindow.showInactive()
 }
 
 /**
@@ -65,6 +71,9 @@ export function showFloatingWindow(x: number, y: number): void {
 export function hideFloatingWindow(): void {
   if (floatingWindow && !floatingWindow.isDestroyed()) {
     floatingWindow.hide()
+
+    // 通知渲染进程窗口已隐藏
+    floatingWindow.webContents.send('floating:hidden')
   }
 }
 

@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
 import { IPC_CHANNELS } from './utils/platform'
 
@@ -30,6 +30,9 @@ export function createPanelWindow(): BrowserWindow {
     }
   })
 
+  // 设置窗口在所有工作区可见
+  panelWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+
   panelWindow.on('closed', () => {
     panelWindow = null
   })
@@ -57,8 +60,15 @@ export function showPanelWindow(
     loadPanelWindowContent()
   }
 
-  // 居中显示
-  panelWindow.center()
+  // 使用鼠标位置确定要在哪个显示器上显示
+  const display = screen.getDisplayNearestPoint({ x: floatingX, y: floatingY })
+
+  // 在指定的显示器上居中显示
+  const { x, y, width, height } = display.workArea
+  const [winWidth, winHeight] = panelWindow.getSize()
+  const newX = Math.round(x + (width - winWidth) / 2)
+  const newY = Math.round(y + (height - winHeight) / 2)
+  panelWindow.setPosition(newX, newY)
 
   // 确保 webContents 准备好后发送 IPC
   console.log(
@@ -71,13 +81,13 @@ export function showPanelWindow(
     panelWindow.webContents.once('did-finish-load', () => {
       console.log('[PanelWindow] did-finish-load, sending IPC with type:', type)
       panelWindow?.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+      panelWindow?.showInactive()
     })
   } else {
     console.log('[PanelWindow] sending IPC immediately with type:', type)
     panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+    panelWindow.showInactive()
   }
-
-  panelWindow.show()
 }
 
 /**
@@ -88,23 +98,6 @@ export function hidePanelWindow(): void {
     panelWindow.hide()
   }
 }
-
-/**
- * 计算安全的窗口位置，确保不超出屏幕边界
- */
-// function safePosition(x: number, y: number): { x: number; y: number } {
-//   const windowWidth = panelWindow?.getSize()[0] ?? 320
-//   const windowHeight = panelWindow?.getSize()[1] ?? 240
-//   const padding = 10
-
-//   const display = screen.getDisplayNearestPoint({ x, y })
-//   const { width, height } = display.workAreaSize
-
-//   const safeX = Math.min(Math.max(x, padding), width - windowWidth - padding)
-//   const safeY = Math.min(Math.max(y, padding), height - windowHeight - padding)
-
-//   return { x: safeX, y: safeY }
-// }
 
 /**
  * 加载面板窗口内容

@@ -78,11 +78,14 @@ function initializeFloatingBall(): void {
 
   // 设置悬浮球 blur 处理器：当 Panel 可见时不隐藏悬浮球
   setFloatingWindowBlurHandler(() => {
-    const panelWindow = getPanelWindow()
-    const isPanelVisible = panelWindow && !panelWindow.isDestroyed() && panelWindow.isVisible()
-    if (!isPanelVisible) {
-      hideFloatingWindow()
-    }
+    // 添加延迟，避免窗口刚显示就因为 blur 立即隐藏
+    setTimeout(() => {
+      const panelWindow = getPanelWindow()
+      const isPanelVisible = panelWindow && !panelWindow.isDestroyed() && panelWindow.isVisible()
+      if (!isPanelVisible) {
+        hideFloatingWindow()
+      }
+    }, 300)
   })
 
   startSelectionListener(handleSelectionTrigger)
@@ -92,15 +95,20 @@ function initializeFloatingBall(): void {
  * 处理划词触发
  */
 let lastSelectionText: string = ''
+let lastTriggerTime: number = 0
 async function handleSelectionTrigger(): Promise<void> {
+  const now = Date.now()
   const position = getCursorPosition()
   const result = await captureSelection()
 
   if (result.success) {
-    // 防止同一文本重复触发
-    if (result.text === lastSelectionText) {
+    // 防止快速重复触发，间隔至少 300ms
+    if (now - lastTriggerTime < 300) {
       return
     }
+    lastTriggerTime = now
+
+    // 更新最后的选中文本，用于后续操作
     lastSelectionText = result.text || ''
     showFloatingWindow(position.x, position.y)
     notifyRenderer(result)

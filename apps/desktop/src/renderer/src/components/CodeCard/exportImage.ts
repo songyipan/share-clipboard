@@ -7,7 +7,10 @@ export async function exportAsImage(
   try {
     const dataUrl = await toPng(element, {
       cacheBust: true,
-      backgroundColor: undefined
+      backgroundColor: undefined,
+      filter: (node) => {
+        return !(node instanceof HTMLElement && node.classList.contains('resize-handle'))
+      }
     })
     const link = document.createElement('a')
     link.download = filename
