@@ -1,6 +1,6 @@
 import { Tray, Menu, nativeImage, NativeImage, app } from 'electron'
 
-import trayIcon from '../../resources/icon.png?asset'
+import trayIcon from '../../resources/trayIcon.svg?asset'
 
 let tray: Tray | null = null
 
@@ -8,9 +8,11 @@ let tray: Tray | null = null
  * 创建托盘图标
  */
 function createTrayIcon(): NativeImage {
-  // 使用应用图标，缩放到托盘大小
+  // macOS 菜单栏图标必须使用 Template Image（黑白透明）
   const icon = nativeImage.createFromPath(trayIcon)
-  return icon.resize({ width: 22, height: 22 })
+  const resized = icon.resize({ width: 22, height: 22 })
+  resized.setTemplateImage(true)
+  return resized
 }
 
 /**

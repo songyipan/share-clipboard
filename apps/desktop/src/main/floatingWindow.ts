@@ -22,12 +22,15 @@ export function createFloatingWindow(): BrowserWindow {
     show: false,
     hasShadow: false,
     backgroundColor: '#00000000',
-    // 移除 type: 'toolbar'，避免可能的问题
+    focusable: false,
+    fullscreenable: false,
+    movable: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      backgroundThrottling: false
     }
   })
 
