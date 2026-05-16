@@ -8,7 +8,7 @@ export function FloatingBallPage(): React.JSX.Element {
     document.documentElement.style.background = 'transparent'
     document.body.style.margin = '0'
     document.body.style.padding = '0'
-    
+
     return () => {
       // 清理，恢复默认样式
       document.body.style.background = ''

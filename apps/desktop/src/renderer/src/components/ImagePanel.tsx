@@ -10,6 +10,7 @@ import {
   SelectValue
 } from '@share-clipboard/ui/components/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@share-clipboard/ui/components/tabs'
+import { CodeCard, ConfigPanel, useCodeCardConfig, exportAsImage } from './CodeCard'
 
 type PreviewTheme = 'light' | 'dark'
 
@@ -139,6 +140,7 @@ interface ToolbarProps {
   selectedLanguage: string
   onThemeChange: (theme: PreviewTheme) => void
   onLanguageChange: (lang: string) => void
+  codeCardConfig: ReturnType<typeof useCodeCardConfig>
 }
 
 function Toolbar({
@@ -146,13 +148,22 @@ function Toolbar({
   previewTheme,
   selectedLanguage,
   onThemeChange,
-  onLanguageChange
+  onLanguageChange,
+  codeCardConfig
 }: ToolbarProps): React.JSX.Element {
+  const handleExport = async (): Promise<void> => {
+    const element = document.getElementById('code-card')
+    if (element) {
+      await exportAsImage(element, 'code-card.png')
+    }
+  }
+
   return (
     <div className="flex items-center justify-between shrink-0 gap-2">
       <TabsList>
         <TabsTrigger value="preview">预览</TabsTrigger>
         <TabsTrigger value="edit">编辑</TabsTrigger>
+        <TabsTrigger value="code-card">代码卡片</TabsTrigger>
       </TabsList>
       <div className="flex items-center gap-2">
         {activeTab === 'preview' && (
@@ -183,6 +194,15 @@ function Toolbar({
             </SelectContent>
           </Select>
         )}
+        {activeTab === 'code-card' && (
+          <ConfigPanel
+            config={codeCardConfig}
+            onThemeChange={codeCardConfig.setTheme}
+            onWindowThemeChange={codeCardConfig.setWindowTheme}
+            onBackgroundColorChange={codeCardConfig.setBackgroundColor}
+            onExport={handleExport}
+          />
+        )}
       </div>
     </div>
   )
@@ -193,12 +213,14 @@ export function ImagePanel(): React.JSX.Element {
   const [editText, setEditText] = useSyncEditWithSelected(lastSelectedText)
   const state = useImagePanelState()
   const isDark = useDarkMode()
+  const codeCardConfig = useCodeCardConfig()
 
   const colorMode = state.activeTab === 'preview' ? state.previewTheme : isDark ? 'dark' : 'light'
+  const content = editText || lastSelectedText
 
   const handleLanguageChange = (language: string): void => {
     state.setSelectedLanguage(language)
-    setEditText(wrapCodeWithLanguage(editText || lastSelectedText, language))
+    setEditText(wrapCodeWithLanguage(content, language))
   }
 
   return (
@@ -219,11 +241,12 @@ export function ImagePanel(): React.JSX.Element {
             selectedLanguage={state.selectedLanguage}
             onThemeChange={state.setPreviewTheme}
             onLanguageChange={handleLanguageChange}
+            codeCardConfig={codeCardConfig}
           />
           <TabsContent value="preview" className="flex-1 min-h-0 mt-2">
             <div className="w-full h-full rounded-md border border-input overflow-auto">
               <MDEditor.Markdown
-                source={editText || lastSelectedText}
+                source={content}
                 className="p-4 !bg-transparent"
                 style={{ background: 'transparent' }}
               />
@@ -241,6 +264,9 @@ export function ImagePanel(): React.JSX.Element {
                 style={{ background: 'transparent' }}
               />
             </div>
+          </TabsContent>
+          <TabsContent value="code-card" className="flex-1 min-h-0 mt-2">
+            <CodeCard content={content} config={codeCardConfig} />
           </TabsContent>
         </Tabs>
       </div>
