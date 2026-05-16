@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  // MousePointer,
-  Sparkles,
-  Activity,
-  Command,
-  Search,
-  Languages,
-  ImageIcon
-} from 'lucide-react'
+import { Activity, Command, ImageIcon } from 'lucide-react'
 
 export function MainApp(): React.JSX.Element {
   const [shortcut, setShortcut] = useState<string>('')
@@ -45,12 +37,6 @@ export function MainApp(): React.JSX.Element {
               title="触发快捷键"
               description={`按下 ${shortcut || '⌘⇧C'} 唤起悬浮球`}
             />
-            <GuideStep
-              step={2}
-              icon={<Sparkles className="w-4 h-4" aria-hidden="true" />}
-              title="选择功能"
-              description="点击搜索、翻译或图片识别按钮"
-            />
           </div>
         </section>
 
@@ -61,19 +47,9 @@ export function MainApp(): React.JSX.Element {
           </h2>
           <div className="grid grid-cols-3 gap-3">
             <FeatureCard
-              icon={<Search className="w-5 h-5" aria-hidden="true" />}
-              title="智能搜索"
-              description="一键跳转搜索引擎"
-            />
-            <FeatureCard
-              icon={<Languages className="w-5 h-5" aria-hidden="true" />}
-              title="多语言翻译"
-              description="支持多种语言互译"
-            />
-            <FeatureCard
               icon={<ImageIcon className="w-5 h-5" aria-hidden="true" />}
-              title="图片识别"
-              description="文字转图片搜索"
+              title="图片生成"
+              description="分享图片"
             />
           </div>
         </section>
