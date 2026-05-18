@@ -7,7 +7,7 @@ import {
 } from '@share-clipboard/ui/components/select'
 import { TabsList, TabsTrigger } from '@share-clipboard/ui/components/tabs'
 import { useI18n } from '@share-clipboard/i18n'
-import { ConfigPanel, useCodeCardConfig, exportAsImage } from './CodeCard'
+import { ConfigPanel, useCodeCardConfig, exportAsImage } from '../CodeCard'
 import { PREVIEW_THEMES, PROGRAMMING_LANGUAGES, type PreviewTheme } from './imagePanelConstants'
 
 interface ToolbarProps {
@@ -109,7 +109,7 @@ export function ImagePanelToolbar({
         {activeTab === 'preview' && (
           <PreviewControls previewTheme={previewTheme} onThemeChange={onThemeChange} />
         )}
-        {activeTab === 'edit' && (
+        {(activeTab === 'edit' || activeTab === 'code-card') && (
           <EditControls selectedLanguage={selectedLanguage} onLanguageChange={onLanguageChange} />
         )}
         {activeTab === 'code-card' && <CodeCardControls codeCardConfig={codeCardConfig} />}

@@ -1,7 +1,7 @@
 import { usePanelType } from '../hooks/usePanelType'
-import { SearchPanel } from '../components/SearchPanel'
-import { NotebookPanel } from '../components/NoteBookPanel'
-import { ImagePanel } from '../components/ImagePanel'
+import { SearchPanel } from '../components/search/SearchPanel'
+import { NotebookPanel } from '../components/notebook/NotebookPanel'
+import { ImagePanel } from '../components/image-panel/ImagePanel'
 import { PANEL_TYPES } from '../utils/panel'
 
 export function PanelPage(): React.JSX.Element {

@@ -1,31 +1,38 @@
 import { useEffect, useRef, useState } from 'react'
-import { codeToHtml, type BundledTheme } from 'shiki'
+import { type BundledTheme } from 'shiki'
 import { WindowTitleBar } from './WindowTitleBar'
 import { ResizeHandle } from './ResizeHandle'
 import { useResize } from './useResize'
 import type { CodeCardConfig } from './types'
 import { CODE_CARD_THEMES } from './types'
+import { codeToHtmlJsEngine } from './codeCardHighlighter'
 import { parseCodeContent, renderPlainCode, resolveHighlightLanguage } from './codeHighlight'
 
 interface CodeCardProps {
   content: string
   config: CodeCardConfig
+  uiDeclaredLanguage?: string
 }
 
 async function highlightToHtml(code: string, lang: string, theme: string): Promise<string> {
-  return codeToHtml(code, {
+  return codeToHtmlJsEngine(code, {
     lang: resolveHighlightLanguage(code, lang),
     theme: theme as BundledTheme
   })
 }
 
-function useHighlightedCode(content: string, theme: string, fallbackColor: string): string {
-  const parsed = parseCodeContent(content)
+function useHighlightedCode(
+  content: string,
+  theme: string,
+  fallbackColor: string,
+  uiDeclaredLanguage?: string
+): string {
+  const parsed = parseCodeContent(content, uiDeclaredLanguage)
   const [html, setHtml] = useState(() => renderPlainCode(parsed.code, fallbackColor))
 
   useEffect(() => {
     let cancelled = false
-    const nextParsed = parseCodeContent(content)
+    const nextParsed = parseCodeContent(content, uiDeclaredLanguage)
     const fallbackHtml = renderPlainCode(nextParsed.code, fallbackColor)
 
     Promise.resolve()
@@ -43,7 +50,7 @@ function useHighlightedCode(content: string, theme: string, fallbackColor: strin
     return () => {
       cancelled = true
     }
-  }, [content, theme, fallbackColor])
+  }, [content, theme, fallbackColor, uiDeclaredLanguage])
 
   return html
 }
@@ -73,15 +80,17 @@ function CodeCardContent({
   themeBg,
   themeText,
   shikiTheme,
-  minHeight
+  minHeight,
+  uiDeclaredLanguage
 }: {
   content: string
   themeBg: string
   themeText: string
   shikiTheme: string
   minHeight: number
+  uiDeclaredLanguage?: string
 }): React.JSX.Element {
-  const highlightedHtml = useHighlightedCode(content, shikiTheme, themeText)
+  const highlightedHtml = useHighlightedCode(content, shikiTheme, themeText, uiDeclaredLanguage)
 
   return (
     <div
@@ -100,7 +109,11 @@ function CodeCardContent({
   )
 }
 
-export function CodeCard({ content, config }: CodeCardProps): React.JSX.Element {
+export function CodeCard({
+  content,
+  config,
+  uiDeclaredLanguage
+}: CodeCardProps): React.JSX.Element {
   const cardRef = useRef<HTMLDivElement>(null)
   const { width, height, handleMouseDown } = useResize()
   const themeConfig = CODE_CARD_THEMES[config.theme]
@@ -127,6 +140,7 @@ export function CodeCard({ content, config }: CodeCardProps): React.JSX.Element 
           themeText={themeConfig.text}
           shikiTheme={themeConfig.shikiTheme}
           minHeight={height - 40}
+          uiDeclaredLanguage={uiDeclaredLanguage}
         />
         <ResizeHandle onMouseDown={handleMouseDown} />
       </div>

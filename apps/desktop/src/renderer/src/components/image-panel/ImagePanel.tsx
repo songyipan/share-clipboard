@@ -3,7 +3,7 @@ import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 import remarkBreaks from 'remark-breaks'
 import { Tabs, TabsContent } from '@share-clipboard/ui/components/tabs'
-import { CodeCard, useCodeCardConfig } from './CodeCard'
+import { CodeCard, useCodeCardConfig } from '../CodeCard'
 import { wrapCodeWithLanguage } from './imagePanelCode'
 import {
   useDarkMode,
@@ -72,7 +72,11 @@ export function ImagePanel(): React.JSX.Element {
             </div>
           </TabsContent>
           <TabsContent value="code-card" className="flex-1 min-h-0 mt-2">
-            <CodeCard content={content} config={codeCardConfig} />
+            <CodeCard
+              content={content}
+              config={codeCardConfig}
+              uiDeclaredLanguage={state.selectedLanguage}
+            />
           </TabsContent>
         </Tabs>
       </div>

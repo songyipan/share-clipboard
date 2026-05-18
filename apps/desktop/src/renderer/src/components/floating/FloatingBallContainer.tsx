@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
-import { Button } from './ui/button'
+import { Button } from '@share-clipboard/ui/components/button'
 import { Search, NotebookText, ImageIcon, GripVertical, X, LucideIcon } from 'lucide-react'
-import { PANEL_TYPES, type PanelType } from '../utils/panel'
+import { PANEL_TYPES, type PanelType } from '../../utils/panel'
 import { useI18n } from '@share-clipboard/i18n'
 
 interface FloatingBallContainerProps {

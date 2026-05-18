@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { IPC_CHANNELS } from '../../../shared/ipc'
+import { IPC_CHANNELS } from '../../../../shared/ipc'
 import type { PreviewTheme } from './imagePanelConstants'
 
 interface SelectionResultPayload {

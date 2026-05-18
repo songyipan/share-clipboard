@@ -1,4 +1,4 @@
-import { FloatingBall } from '../components/FloatingBall'
+import { FloatingBall } from '../components/floating/FloatingBall'
 import { useEffect } from 'react'
 
 export function FloatingBallPage(): React.JSX.Element {
