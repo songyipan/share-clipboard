@@ -53,7 +53,11 @@ export function ConfigPanel({
       </Select>
 
       <Select value={config.backgroundColor} onValueChange={onBackgroundColorChange}>
-        <SelectTrigger className="w-24 h-7 text-xs">
+        <SelectTrigger
+          className="w-28 h-7 text-xs"
+          title="画布背景渐变（非代码语言）"
+          aria-label="画布背景渐变"
+        >
           <SelectValue placeholder="背景" />
         </SelectTrigger>
         <SelectContent>

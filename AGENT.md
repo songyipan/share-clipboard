@@ -30,7 +30,7 @@ src/
 └── renderer/       # React 渲染进程
     └── src/
         ├── App.tsx                 # 路由配置
-        ├── components/FloatingBall.tsx  # 悬浮球组件
+        ├── components/floating/FloatingBall.tsx  # 悬浮球组件
         └── pages/MainApp.tsx       # 主界面
 ```
 

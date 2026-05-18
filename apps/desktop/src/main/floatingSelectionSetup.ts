@@ -5,6 +5,7 @@ import {
   hideFloatingWindow,
   loadFloatingWindowContent,
   getFloatingWindow,
+  getFloatingWindowShownAt,
   setFloatingWindowBlurHandler
 } from './floatingWindow'
 import {
@@ -38,6 +39,11 @@ function initializeFloatingBall(): void {
   loadPanelWindowContent()
 
   setFloatingWindowBlurHandler(() => {
+    const blurAt = Date.now()
+    // showInactive + focusable:false 在部分系统上会立刻产生 blur，避免刚显示就被关掉
+    if (blurAt - getFloatingWindowShownAt() < 150) {
+      return
+    }
     setTimeout(() => {
       const panelWindow = getPanelWindow()
       const isPanelVisible = panelWindow && !panelWindow.isDestroyed() && panelWindow.isVisible()
@@ -112,7 +118,10 @@ function registerIpcHandlers(): void {
     hideFloatingWindow()
   })
 
-  ipcMain.handle(IPC_CHANNELS.FLOATING_READY, () => {
+  ipcMain.handle(IPC_CHANNELS.FLOATING_READY, (event) => {
+    const floatingWin = getFloatingWindow()
+    if (!floatingWin || floatingWin.isDestroyed()) return
+    if (event.sender !== floatingWin.webContents) return
     isFloatingRendererReady = true
     flushPendingSelectionResult()
   })

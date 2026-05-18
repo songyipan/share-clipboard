@@ -44,7 +44,9 @@
     "notebookTitle": "笔记功能",
     "preview": "预览",
     "edit": "编辑",
-    "codeCard": "代码卡片"
+    "codeCard": "分享卡片",
+    "hidePreview": "隐藏预览",
+    "showPreview": "显示预览"
   },
   "floating": {
     "dragToMove": "拖动移动",

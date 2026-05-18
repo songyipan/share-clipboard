@@ -1,8 +1,8 @@
 import { Card, CardContent, CardFooter } from '@share-clipboard/ui/components/card'
-import { SearchForm } from './search/SearchForm'
-import { SearchPanelHeader } from './search/SearchPanelHeader'
-import { SearchSettings } from './search/SearchSettings'
-import { useSearchPanelController } from './search/useSearchPanelController'
+import { SearchForm } from './SearchForm'
+import { SearchPanelHeader } from './SearchPanelHeader'
+import { SearchSettings } from './SearchSettings'
+import { useSearchPanelController } from './useSearchPanelController'
 import { useI18n } from '@share-clipboard/i18n'
 
 export function SearchPanel(): React.JSX.Element {

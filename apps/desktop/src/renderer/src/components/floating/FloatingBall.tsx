@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useSelectionResult } from '../hooks/useSelectionResult'
-import { useFloatingBallHidden } from '../hooks/useFloatingBallHidden'
-import { useResizeWindow } from '../hooks/useResizeWindow'
+import { useSelectionResult } from '../../hooks/useSelectionResult'
+import { useFloatingBallHidden } from '../../hooks/useFloatingBallHidden'
+import { useResizeWindow } from '../../hooks/useResizeWindow'
 import { FloatingBallContainer } from './FloatingBallContainer'
-import type { PanelType } from '../utils/panel'
+import type { PanelType } from '../../utils/panel'
 
 export function FloatingBall(): React.JSX.Element | null {
   const [visible, setVisible] = useState<boolean>(false)

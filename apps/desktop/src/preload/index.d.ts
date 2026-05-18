@@ -12,6 +12,9 @@ interface FloatingBallAPI {
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
   onFloatingBallHidden: (callback: () => void) => () => void
+  onSelectionResult: (
+    callback: (result: { success: boolean; text: string; error?: string }) => void
+  ) => () => void
   onPanelType: (callback: (type: string) => void) => () => void
   resizeFloatingWindow: (width: number, height: number) => Promise<void>
   getLastSelectedText: () => Promise<string>

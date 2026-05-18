@@ -41,7 +41,7 @@ Three-layer Electron structure:
 - `main/mouseListener.ts` - Global shortcut listener
 - `main/selection.ts` - Clipboard capture + simulated copy (Cmd/Ctrl+C)
 - `main/utils/platform.ts` - Platform detection + IPC channel constants
-- `renderer/components/FloatingBall.tsx` - Floating ball UI component
+- `renderer/src/components/floating/FloatingBall.tsx` - Floating ball UI component
 
 ### Multi-Window Routing
 

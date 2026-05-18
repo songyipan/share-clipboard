@@ -16,11 +16,18 @@ export function escapeHtml(text: string): string {
     .replaceAll("'", '&#39;')
 }
 
-export function parseCodeContent(content: string): ParsedCode {
+export function parseCodeContent(content: string, uiDeclaredLanguage?: string): ParsedCode {
   const trimmedContent = content.trim()
   const match = trimmedContent.match(FENCED_CODE_PATTERN)
 
   if (!match) {
+    const key = uiDeclaredLanguage?.trim().toLowerCase() ?? ''
+    if (key && needsLanguageInference(key)) {
+      return { code: content, language: 'plaintext' }
+    }
+    if (key) {
+      return { code: content, language: uiDeclaredLanguage!.trim() }
+    }
     return { code: content, language: 'plaintext' }
   }
 
@@ -82,6 +89,20 @@ export function resolveHighlightLanguage(code: string, declared: string): Bundle
     return 'json'
   } catch {
     /* not JSON */
+  }
+
+  const looksTs =
+    /\b(interface|type|enum)\s+[A-Za-z_$]|\bimplements\s+[A-Za-z_$]|: string\b|: number\b|: boolean\b|: void\b|as\s+const\b|<[A-Za-z_$][\w$]*(?:\.\w+)?>/.test(
+      c
+    )
+  const looksJsLike =
+    /\b(?:const|let|var|function|class)\b\s/.test(c) ||
+    /=>\s*[{(]|=>\s*[\w`'"]/.test(c) ||
+    /\b(?:async|await)\b/.test(c) ||
+    /^\s*\/\/.|\/\*[\s\S]*\*\//.test(c)
+
+  if (looksJsLike || looksTs) {
+    return looksTs ? 'typescript' : 'javascript'
   }
 
   return 'text' as BundledLanguage
