@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { IPC_CHANNELS } from '../../../shared/ipc'
 
 interface SelectionResult {
   success: boolean
   text: string
   error?: string
 }
-
-const IPC_CHANNEL = 'selection:result'
 
 /**
  * 监听选中文本结果的 hook
@@ -25,10 +24,10 @@ export function useSelectionResult(onSuccess: () => void): void {
       }
     }
 
-    window.electron.ipcRenderer.on(IPC_CHANNEL, handler)
+    window.electron.ipcRenderer.on(IPC_CHANNELS.SELECTION_RESULT, handler)
 
     return () => {
-      window.electron.ipcRenderer.removeListener(IPC_CHANNEL, handler)
+      window.electron.ipcRenderer.removeListener(IPC_CHANNELS.SELECTION_RESULT, handler)
     }
   }, [])
 }

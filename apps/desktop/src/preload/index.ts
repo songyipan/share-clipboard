@@ -1,16 +1,17 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { IPC_CHANNELS } from '../shared/ipc'
 
 // Custom APIs for renderer
 const api = {
   // 悬浮球相关
-  showFloatingBall: (text: string) => ipcRenderer.invoke('floating:show', text),
-  hideFloatingBall: () => ipcRenderer.invoke('floating:hide'),
-  getSelectedText: () => ipcRenderer.invoke('selection:get'),
+  showFloatingBall: (text: string) => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_SHOW, text),
+  hideFloatingBall: () => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_HIDE),
+  getSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_GET),
 
   // 面板相关
-  showPanel: (type: string) => ipcRenderer.invoke('panel:show', type),
-  hidePanel: () => ipcRenderer.invoke('panel:hide'),
+  showPanel: (type: string) => ipcRenderer.invoke(IPC_CHANNELS.PANEL_SHOW, type),
+  hidePanel: () => ipcRenderer.invoke(IPC_CHANNELS.PANEL_HIDE),
 
   // 监听面板类型
   onPanelType: (callback: (type: string) => void): (() => void) => {
@@ -18,26 +19,26 @@ const api = {
       console.log('[Preload] panel:type received:', type)
       callback(type)
     }
-    ipcRenderer.on('panel:type', handler)
-    return () => ipcRenderer.removeListener('panel:type', handler)
+    ipcRenderer.on(IPC_CHANNELS.PANEL_TYPE, handler)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.PANEL_TYPE, handler)
   },
 
   // 监听器状态
-  isListenerActive: () => ipcRenderer.invoke('listener:status'),
-  getCurrentShortcut: () => ipcRenderer.invoke('listener:shortcut'),
+  isListenerActive: () => ipcRenderer.invoke(IPC_CHANNELS.LISTENER_STATUS),
+  getCurrentShortcut: () => ipcRenderer.invoke(IPC_CHANNELS.LISTENER_SHORTCUT),
 
   // 监听悬浮球隐藏事件
   onFloatingBallHidden: (callback: () => void) => {
-    ipcRenderer.on('floating:hidden', callback)
-    return () => ipcRenderer.removeListener('floating:hidden', callback)
+    ipcRenderer.on(IPC_CHANNELS.FLOATING_HIDDEN, callback)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.FLOATING_HIDDEN, callback)
   },
 
   // 调整悬浮球窗口大小
   resizeFloatingWindow: (width: number, height: number) =>
-    ipcRenderer.invoke('floating:resize', width, height),
+    ipcRenderer.invoke(IPC_CHANNELS.FLOATING_RESIZE, width, height),
 
   // 获取最后一次选中的文本
-  getLastSelectedText: () => ipcRenderer.invoke('selection:last')
+  getLastSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_LAST)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

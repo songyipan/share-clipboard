@@ -1,5 +1,6 @@
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
+import { IPC_CHANNELS } from '../shared/ipc'
 
 let floatingWindow: BrowserWindow | null = null
 
@@ -76,7 +77,7 @@ export function hideFloatingWindow(): void {
     floatingWindow.hide()
 
     // 通知渲染进程窗口已隐藏
-    floatingWindow.webContents.send('floating:hidden')
+    floatingWindow.webContents.send(IPC_CHANNELS.FLOATING_HIDDEN)
   }
 }
 
@@ -89,10 +90,10 @@ function safePosition(x: number, y: number): { x: number; y: number } {
   const padding = 10
 
   const display = screen.getDisplayNearestPoint({ x, y })
-  const { width, height } = display.workAreaSize
+  const { x: areaX, y: areaY, width, height } = display.workArea
 
-  const safeX = Math.min(Math.max(x, padding), width - windowWidth - padding)
-  const safeY = Math.min(Math.max(y, padding), height - windowHeight - padding)
+  const safeX = Math.min(Math.max(x, areaX + padding), areaX + width - windowWidth - padding)
+  const safeY = Math.min(Math.max(y, areaY + padding), areaY + height - windowHeight - padding)
 
   return { x: safeX, y: safeY }
 }
