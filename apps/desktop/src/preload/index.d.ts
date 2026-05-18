@@ -7,12 +7,14 @@ interface FloatingBallAPI {
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
   showPanel: (type: string) => Promise<void>
   hidePanel: () => Promise<void>
+  resizePanelWindow: (width: number, height: number) => Promise<void>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
   onFloatingBallHidden: (callback: () => void) => () => void
   onPanelType: (callback: (type: string) => void) => () => void
   resizeFloatingWindow: (width: number, height: number) => Promise<void>
   getLastSelectedText: () => Promise<string>
+  openExternal: (url: string) => Promise<void>
 }
 
 declare global {

@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    files: ["**/*.{js,cjs,mjs,ts,tsx,jsx}"],
+    rules: {
+      "max-lines": ["error", { max: 200 }],
+    },
+  },
 ]);
 
 export default eslintConfig;

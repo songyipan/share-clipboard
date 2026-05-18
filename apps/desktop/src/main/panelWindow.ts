@@ -4,6 +4,22 @@ import { IPC_CHANNELS } from './utils/platform'
 
 let panelWindow: BrowserWindow | null = null
 
+interface PanelSize {
+  width: number
+  height: number
+}
+
+const DEFAULT_PANEL_SIZE: PanelSize = { width: 920, height: 640 }
+const PANEL_SIZES: Record<string, PanelSize> = {
+  search: { width: 760, height: 300 },
+  image: DEFAULT_PANEL_SIZE,
+  notebook: { width: 720, height: 520 }
+}
+
+function getPanelSize(type: string): PanelSize {
+  return PANEL_SIZES[type] ?? DEFAULT_PANEL_SIZE
+}
+
 /**
  * 创建面板窗口
  */
@@ -59,6 +75,9 @@ export function showPanelWindow(
     panelWindow = createPanelWindow()
     loadPanelWindowContent()
   }
+
+  const panelSize = getPanelSize(type)
+  panelWindow.setSize(panelSize.width, panelSize.height)
 
   // 使用鼠标位置确定要在哪个显示器上显示
   const display = screen.getDisplayNearestPoint({ x: floatingX, y: floatingY })

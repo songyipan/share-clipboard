@@ -12,6 +12,7 @@
     "dev:web": "turbo run dev --filter @share-clipboard/web"
   },
   "devDependencies": {
+    "resolve": "^1.22.12",
     "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@10.11.1",

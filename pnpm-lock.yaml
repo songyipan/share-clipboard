@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      resolve:
+        specifier: ^1.22.12
+        version: 1.22.12
       turbo:
         specifier: ^2.5.4
         version: 2.9.14
@@ -23,6 +26,9 @@ importers:
       '@nut-tree-fork/nut-js':
         specifier: ^4.2.6
         version: 4.2.6
+      '@share-clipboard/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@share-clipboard/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -44,6 +50,12 @@ importers:
       lucide-react:
         specifier: ^1.16.0
         version: 1.16.0(react@19.2.4)
+      react:
+        specifier: ^19.2.1
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.1
+        version: 19.2.4(react@19.2.4)
       react-router-dom:
         specifier: ^7.15.0
         version: 7.15.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -102,12 +114,9 @@ importers:
       prettier:
         specifier: ^3.7.4
         version: 3.8.3
-      react:
-        specifier: ^19.2.1
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.2.1
-        version: 19.2.4(react@19.2.4)
+      resolve:
+        specifier: ^1.22.12
+        version: 1.22.12
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -169,6 +178,24 @@ importers:
       eslint:
         specifier: ^9
         version: 9.39.4(jiti@2.7.0)
+
+  packages/i18n:
+    devDependencies:
+      '@share-clipboard/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      eslint:
+        specifier: ^9
+        version: 9.39.4(jiti@2.7.0)
+      react:
+        specifier: ^19
+        version: 19.2.4
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/tsconfig:
     devDependencies:
@@ -5375,6 +5402,11 @@ packages:
 
   resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
+
+  resolve@1.22.12:
+    resolution: {integrity: sha512-TyeJ1zif53BPfHootBGwPRYT1RUt6oGWsaQr8UyZW/eAm9bKoijtvruSDEmZHm92CwS9nj7/fWttqPCgzep8CA==}
+    engines: {node: '>= 0.4'}
+    hasBin: true
 
   resolve@2.0.0-next.6:
     resolution: {integrity: sha512-3JmVl5hMGtJ3kMmB3zi3DL25KfkCEyy3Tw7Gmw7z5w8M9WlwoPFnIvwChzu1+cF3iaK3sp18hhPz8ANeimdJfA==}
@@ -11993,6 +12025,13 @@ snapshots:
   resolve-from@4.0.0: {}
 
   resolve-pkg-maps@1.0.0: {}
+
+  resolve@1.22.12:
+    dependencies:
+      es-errors: 1.3.0
+      is-core-module: 2.16.2
+      path-parse: 1.0.7
+      supports-preserve-symlinks-flag: 1.0.0
 
   resolve@2.0.0-next.6:
     dependencies:

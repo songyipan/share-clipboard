@@ -1,0 +1,54 @@
+{
+  "main": {
+    "appTitle": "Share Clipboard",
+    "appDescription": "划词后用快捷键唤起悬浮工具",
+    "settings": "设置",
+    "hideSettings": "收起设置",
+    "settingsDescription": "设置显示语言和主题偏好。",
+    "language": "语言",
+    "theme": "主题",
+    "guideTitle": "使用指南",
+    "triggerShortcut": "触发快捷键",
+    "triggerDescription": "按下 {{shortcut}} 唤起悬浮球",
+    "featureTitle": "功能特性",
+    "imageGeneration": "图片生成",
+    "imageDescription": "分享图片",
+    "running": "运行中",
+    "paused": "已暂停",
+    "listenerEnabled": "划词监听已启用",
+    "listenerDisabled": "划词监听未启用",
+    "normal": "正常",
+    "abnormal": "异常"
+  },
+  "settings": {
+    "chinese": "简体中文",
+    "english": "English",
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "search": {
+    "title": "快速搜索",
+    "defaultPrefix": "默认：",
+    "description": "划词后自动填入关键词，回车使用默认搜索源。",
+    "expandSettings": "展开搜索设置",
+    "collapseSettings": "收起搜索设置",
+    "closeSettings": "关闭设置",
+    "keyword": "搜索关键词",
+    "placeholder": "输入关键词或粘贴文本…",
+    "withEngine": "用 {{engine}} 搜索",
+    "hintHasQuery": "提示：搜索将在系统默认浏览器中打开。",
+    "hintEmpty": "先划选文本，或直接输入关键词开始。"
+  },
+  "panel": {
+    "notebookTitle": "笔记功能",
+    "preview": "预览",
+    "edit": "编辑",
+    "codeCard": "代码卡片"
+  },
+  "floating": {
+    "dragToMove": "拖动移动",
+    "closeFloatingBall": "关闭悬浮球",
+    "close": "关闭"
+  }
+}

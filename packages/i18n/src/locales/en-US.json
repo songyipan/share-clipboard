@@ -1,0 +1,54 @@
+{
+  "main": {
+    "appTitle": "Share Clipboard",
+    "appDescription": "Select text, then use the shortcut to open quick tools",
+    "settings": "Settings",
+    "hideSettings": "Hide settings",
+    "settingsDescription": "Choose the display language and theme preference.",
+    "language": "Language",
+    "theme": "Theme",
+    "guideTitle": "Guide",
+    "triggerShortcut": "Trigger shortcut",
+    "triggerDescription": "Press {{shortcut}} to open the floating ball",
+    "featureTitle": "Features",
+    "imageGeneration": "Image generation",
+    "imageDescription": "Share as image",
+    "running": "Running",
+    "paused": "Paused",
+    "listenerEnabled": "Selection listener is enabled",
+    "listenerDisabled": "Selection listener is disabled",
+    "normal": "Normal",
+    "abnormal": "Unavailable"
+  },
+  "settings": {
+    "chinese": "简体中文",
+    "english": "English",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "search": {
+    "title": "Quick Search",
+    "defaultPrefix": "Default: ",
+    "description": "Selected text is filled automatically. Press Enter to use the default engine.",
+    "expandSettings": "Open search settings",
+    "collapseSettings": "Collapse search settings",
+    "closeSettings": "Close settings",
+    "keyword": "Search keywords",
+    "placeholder": "Enter keywords or paste text…",
+    "withEngine": "Search with {{engine}}",
+    "hintHasQuery": "Tip: Search opens in your default browser.",
+    "hintEmpty": "Select text first, or type keywords to start."
+  },
+  "panel": {
+    "notebookTitle": "Notes",
+    "preview": "Preview",
+    "edit": "Edit",
+    "codeCard": "Code Card"
+  },
+  "floating": {
+    "dragToMove": "Drag to move",
+    "closeFloatingBall": "Close floating ball",
+    "close": "Close"
+  }
+}

@@ -11,5 +11,7 @@ export const IPC_CHANNELS = {
   LISTENER_SHORTCUT: 'listener:shortcut',
   PANEL_SHOW: 'panel:show',
   PANEL_HIDE: 'panel:hide',
-  PANEL_TYPE: 'panel:type'
+  PANEL_TYPE: 'panel:type',
+  PANEL_RESIZE: 'panel:resize',
+  EXTERNAL_OPEN: 'external:open'
 } as const

@@ -2,6 +2,7 @@ import { forwardRef } from 'react'
 import { Button } from './ui/button'
 import { Search, NotebookText, ImageIcon, GripVertical, X, LucideIcon } from 'lucide-react'
 import { PANEL_TYPES, type PanelType } from '../utils/panel'
+import { useI18n } from '@share-clipboard/i18n'
 
 interface FloatingBallContainerProps {
   onAction: (type: PanelType) => void
@@ -10,6 +11,8 @@ interface FloatingBallContainerProps {
 
 export const FloatingBallContainer = forwardRef<HTMLDivElement, FloatingBallContainerProps>(
   function FloatingBallContainer({ onAction, onClose }, ref): React.JSX.Element {
+    const { t } = useI18n()
+
     return (
       <div
         className="inline-flex justify-center items-center"
@@ -30,20 +33,24 @@ export const FloatingBallContainer = forwardRef<HTMLDivElement, FloatingBallCont
             } as React.CSSProperties
           }
         >
-          <DragHandle />
+          <DragHandle title={t('floating.dragToMove')} />
           <ActionButtons onAction={onAction} />
-          <CloseButton onClose={onClose} />
+          <CloseButton
+            label={t('floating.closeFloatingBall')}
+            title={t('floating.close')}
+            onClose={onClose}
+          />
         </div>
       </div>
     )
   }
 )
 
-function DragHandle(): React.JSX.Element {
+function DragHandle({ title }: { title: string }): React.JSX.Element {
   return (
     <div
       className="flex items-center justify-center w-6 h-6 text-muted-foreground hover:text-muted-foreground/80 transition-colors"
-      title="拖动移动"
+      title={title}
     >
       <GripVertical className="size-4" />
     </div>
@@ -74,15 +81,23 @@ function ActionButton({
   )
 }
 
-function CloseButton({ onClose }: { onClose: () => void }): React.JSX.Element {
+function CloseButton({
+  label,
+  title,
+  onClose
+}: {
+  label: string
+  title: string
+  onClose: () => void
+}): React.JSX.Element {
   return (
     <Button
       variant="ghost"
       size="icon-sm"
       className="rounded-full text-muted-foreground hover:text-foreground"
       style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-      aria-label="关闭悬浮球"
-      title="关闭"
+      aria-label={label}
+      title={title}
       onClick={onClose}
     >
       <X />
