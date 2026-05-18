@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { IPC_CHANNELS } from '../../../../shared/ipc'
-import type { PreviewTheme } from './imagePanelConstants'
+import type { PreviewTheme } from '../markdown/markdownConstants'
 
 interface SelectionResultPayload {
   success: boolean
@@ -30,21 +30,6 @@ export function useSelectedText(): string {
   }, [])
 
   return text
-}
-
-export function useDarkMode(): boolean {
-  const [isDark, setIsDark] = useState(
-    () => window.matchMedia('(prefers-color-scheme: dark)').matches
-  )
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (e: MediaQueryListEvent): void => setIsDark(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  return isDark
 }
 
 export function useSyncEditWithSelected(
@@ -87,3 +72,5 @@ export function useImagePanelState(): ImagePanelState & {
     setSelectedLanguage
   }
 }
+
+export { useDarkMode } from '../../hooks/useDarkMode'

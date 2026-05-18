@@ -1,9 +1,6 @@
-import MDEditor from '@uiw/react-md-editor'
-import '@uiw/react-md-editor/markdown-editor.css'
-import '@uiw/react-markdown-preview/markdown.css'
-import remarkBreaks from 'remark-breaks'
 import { Tabs, TabsContent } from '@share-clipboard/ui/components/tabs'
 import { CodeCard, useCodeCardConfig } from '../CodeCard'
+import { MarkdownEditor, MarkdownPreview } from '../markdown'
 import { wrapCodeWithLanguage } from './imagePanelCode'
 import {
   useDarkMode,
@@ -49,27 +46,10 @@ export function ImagePanel(): React.JSX.Element {
             codeCardConfig={codeCardConfig}
           />
           <TabsContent value="preview" className="flex-1 min-h-0 mt-2">
-            <div className="w-full h-full rounded-md border border-input overflow-auto">
-              <MDEditor.Markdown
-                remarkPlugins={[remarkBreaks]}
-                source={content}
-                className="p-4 !bg-transparent"
-                style={{ background: 'transparent' }}
-              />
-            </div>
+            <MarkdownPreview source={content} />
           </TabsContent>
           <TabsContent value="edit" className="flex-1 min-h-0 mt-2">
-            <div className="w-full h-full rounded-md border border-input overflow-hidden">
-              <MDEditor
-                value={editText}
-                onChange={(v) => setEditText(v || '')}
-                height="100%"
-                preview="edit"
-                hideToolbar
-                visibleDragbar={false}
-                style={{ background: 'transparent' }}
-              />
-            </div>
+            <MarkdownEditor value={editText} onChange={setEditText} />
           </TabsContent>
           <TabsContent value="code-card" className="flex-1 min-h-0 mt-2">
             <CodeCard

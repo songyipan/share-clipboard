@@ -44,7 +44,9 @@
     "notebookTitle": "Notes",
     "preview": "Preview",
     "edit": "Edit",
-    "codeCard": "Share Card"
+    "codeCard": "Share Card",
+    "hidePreview": "Hide preview",
+    "showPreview": "Show preview"
   },
   "floating": {
     "dragToMove": "Drag to move",

@@ -8,7 +8,9 @@ import {
 import { TabsList, TabsTrigger } from '@share-clipboard/ui/components/tabs'
 import { useI18n } from '@share-clipboard/i18n'
 import { ConfigPanel, useCodeCardConfig, exportAsImage } from '../CodeCard'
-import { PREVIEW_THEMES, PROGRAMMING_LANGUAGES, type PreviewTheme } from './imagePanelConstants'
+import { MarkdownPreviewThemeSelect } from '../markdown'
+import type { PreviewTheme } from '../markdown'
+import { PROGRAMMING_LANGUAGES } from './imagePanelConstants'
 
 interface ToolbarProps {
   activeTab: string
@@ -17,29 +19,6 @@ interface ToolbarProps {
   onThemeChange: (theme: PreviewTheme) => void
   onLanguageChange: (lang: string) => void
   codeCardConfig: ReturnType<typeof useCodeCardConfig>
-}
-
-function PreviewControls({
-  previewTheme,
-  onThemeChange
-}: {
-  previewTheme: PreviewTheme
-  onThemeChange: (theme: PreviewTheme) => void
-}): React.JSX.Element {
-  return (
-    <Select value={previewTheme} onValueChange={(value) => onThemeChange(value as PreviewTheme)}>
-      <SelectTrigger className="h-7 w-24 text-xs">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {(Object.keys(PREVIEW_THEMES) as PreviewTheme[]).map((key) => (
-          <SelectItem key={key} value={key}>
-            {PREVIEW_THEMES[key].label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
 }
 
 function EditControls({
@@ -107,7 +86,7 @@ export function ImagePanelToolbar({
       </TabsList>
       <div className="flex items-center gap-2">
         {activeTab === 'preview' && (
-          <PreviewControls previewTheme={previewTheme} onThemeChange={onThemeChange} />
+          <MarkdownPreviewThemeSelect value={previewTheme} onValueChange={onThemeChange} />
         )}
         {(activeTab === 'edit' || activeTab === 'code-card') && (
           <EditControls selectedLanguage={selectedLanguage} onLanguageChange={onLanguageChange} />
