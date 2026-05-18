@@ -7,10 +7,12 @@ import { PANEL_TYPES } from '../utils/panel'
 export function PanelPage(): React.JSX.Element {
   const panelType = usePanelType()
 
-  const renderPanel = (): React.JSX.Element => {
+  const renderPanel = (): React.JSX.Element | null => {
+    if (!panelType) return null
     if (panelType === PANEL_TYPES.NOTEBOOK) return <NotebookPanel />
     if (panelType === PANEL_TYPES.IMAGE) return <ImagePanel />
-    return <SearchPanel />
+    if (panelType === PANEL_TYPES.SEARCH) return <SearchPanel />
+    return null
   }
 
   return (

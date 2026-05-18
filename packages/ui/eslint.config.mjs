@@ -1,4 +1,2 @@
-/** @type {import('eslint').Linter.Config} */
-const config = [];
-
-export default config;
+/** @type {import('eslint').Linter.Config[]} */
+export default [{}]

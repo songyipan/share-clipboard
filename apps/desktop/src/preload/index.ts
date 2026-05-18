@@ -7,11 +7,15 @@ const api = {
   // 悬浮球相关
   showFloatingBall: (text: string) => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_SHOW, text),
   hideFloatingBall: () => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_HIDE),
+  notifyFloatingReady: () => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_READY),
   getSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_GET),
 
   // 面板相关
   showPanel: (type: string) => ipcRenderer.invoke(IPC_CHANNELS.PANEL_SHOW, type),
   hidePanel: () => ipcRenderer.invoke(IPC_CHANNELS.PANEL_HIDE),
+  getCurrentPanelType: () => ipcRenderer.invoke(IPC_CHANNELS.PANEL_CURRENT),
+  resizePanelWindow: (width: number, height: number) =>
+    ipcRenderer.invoke(IPC_CHANNELS.PANEL_RESIZE, width, height),
 
   // 监听面板类型
   onPanelType: (callback: (type: string) => void): (() => void) => {
@@ -38,7 +42,10 @@ const api = {
     ipcRenderer.invoke(IPC_CHANNELS.FLOATING_RESIZE, width, height),
 
   // 获取最后一次选中的文本
-  getLastSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_LAST)
+  getLastSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_LAST),
+
+  // 打开外部链接
+  openExternal: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.EXTERNAL_OPEN, url)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

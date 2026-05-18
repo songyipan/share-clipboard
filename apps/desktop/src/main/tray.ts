@@ -1,17 +1,24 @@
 import { Tray, Menu, nativeImage, NativeImage, app } from 'electron'
 
-import trayIcon from '../../resources/trayIcon.svg?asset'
+import trayIcon from '../../resources/TrayIconTemplate.png?asset'
+import { isMac } from './utils/platform'
 
 let tray: Tray | null = null
+const MACOS_TRAY_TITLE = 'S'
 
 /**
  * 创建托盘图标
  */
 function createTrayIcon(): NativeImage {
-  // macOS 菜单栏图标必须使用 Template Image（黑白透明）
   const icon = nativeImage.createFromPath(trayIcon)
-  const resized = icon.resize({ width: 22, height: 22 })
-  resized.setTemplateImage(true)
+  if (icon.isEmpty()) {
+    return icon
+  }
+
+  const resized = icon.resize({ width: 16, height: 16 })
+  if (isMac) {
+    resized.setTemplateImage(true)
+  }
   return resized
 }
 
@@ -45,8 +52,11 @@ export function createTray(onShowMainWindow: () => void): Tray {
   tray.setToolTip('Share Clipboard')
   tray.setContextMenu(contextMenu)
 
-  // macOS: 点击托盘图标也显示菜单
-  if (process.platform === 'darwin') {
+  if (isMac) {
+    if (icon.isEmpty()) {
+      tray.setTitle(MACOS_TRAY_TITLE)
+    }
+
     tray.on('click', () => {
       tray?.popUpContextMenu()
     })

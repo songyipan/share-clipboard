@@ -3,6 +3,32 @@ import { join } from 'path'
 import { IPC_CHANNELS } from './utils/platform'
 
 let panelWindow: BrowserWindow | null = null
+let currentPanelType = 'search'
+
+interface PanelSize {
+  width: number
+  height: number
+}
+
+const DEFAULT_PANEL_SIZE: PanelSize = { width: 920, height: 640 }
+const PANEL_SIZES: Record<string, PanelSize> = {
+  search: { width: 760, height: 300 },
+  image: DEFAULT_PANEL_SIZE,
+  notebook: { width: 720, height: 520 }
+}
+
+function getPanelSize(type: string): PanelSize {
+  return PANEL_SIZES[type] ?? DEFAULT_PANEL_SIZE
+}
+
+export function getCurrentPanelType(): string {
+  return currentPanelType
+}
+
+function sendCurrentPanelType(): void {
+  if (!panelWindow || panelWindow.isDestroyed()) return
+  panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, currentPanelType)
+}
 
 /**
  * 创建面板窗口
@@ -55,10 +81,15 @@ export function showPanelWindow(
   floatingY: number,
   type: string = 'search'
 ): void {
+  currentPanelType = type
+
   if (!panelWindow || panelWindow.isDestroyed()) {
     panelWindow = createPanelWindow()
     loadPanelWindowContent()
   }
+
+  const panelSize = getPanelSize(type)
+  panelWindow.setSize(panelSize.width, panelSize.height)
 
   // 使用鼠标位置确定要在哪个显示器上显示
   const display = screen.getDisplayNearestPoint({ x: floatingX, y: floatingY })
@@ -79,13 +110,13 @@ export function showPanelWindow(
   )
   if (panelWindow.webContents.isLoading()) {
     panelWindow.webContents.once('did-finish-load', () => {
-      console.log('[PanelWindow] did-finish-load, sending IPC with type:', type)
-      panelWindow?.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+      console.log('[PanelWindow] did-finish-load, sending IPC with type:', currentPanelType)
+      sendCurrentPanelType()
       panelWindow?.showInactive()
     })
   } else {
-    console.log('[PanelWindow] sending IPC immediately with type:', type)
-    panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+    console.log('[PanelWindow] sending IPC immediately with type:', currentPanelType)
+    sendCurrentPanelType()
     panelWindow.showInactive()
   }
 }

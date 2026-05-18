@@ -3,15 +3,19 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 interface FloatingBallAPI {
   showFloatingBall: (text: string) => Promise<void>
   hideFloatingBall: () => Promise<void>
+  notifyFloatingReady: () => Promise<void>
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
   showPanel: (type: string) => Promise<void>
   hidePanel: () => Promise<void>
+  getCurrentPanelType: () => Promise<string>
+  resizePanelWindow: (width: number, height: number) => Promise<void>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
   onFloatingBallHidden: (callback: () => void) => () => void
   onPanelType: (callback: (type: string) => void) => () => void
   resizeFloatingWindow: (width: number, height: number) => Promise<void>
   getLastSelectedText: () => Promise<string>
+  openExternal: (url: string) => Promise<void>
 }
 
 declare global {

@@ -18,7 +18,13 @@ export function FloatingBall(): React.JSX.Element | null {
     })
   }
 
+  const handleClose = (): void => {
+    window.api.hideFloatingBall().catch((error) => {
+      console.error('[FloatingBall] Failed to hide floating ball:', error)
+    })
+  }
+
   if (!visible) return null
 
-  return <FloatingBallContainer ref={containerRef} onAction={handleAction} />
+  return <FloatingBallContainer ref={containerRef} onAction={handleAction} onClose={handleClose} />
 }

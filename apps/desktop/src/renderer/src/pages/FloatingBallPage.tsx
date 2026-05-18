@@ -8,6 +8,9 @@ export function FloatingBallPage(): React.JSX.Element {
     document.documentElement.style.background = 'transparent'
     document.body.style.margin = '0'
     document.body.style.padding = '0'
+    window.api.notifyFloatingReady().catch((error) => {
+      console.error('[FloatingBallPage] Failed to notify ready:', error)
+    })
 
     return () => {
       // 清理，恢复默认样式
