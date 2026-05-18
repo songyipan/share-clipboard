@@ -7,6 +7,7 @@ interface FloatingBallAPI {
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
   showPanel: (type: string) => Promise<void>
   hidePanel: () => Promise<void>
+  getCurrentPanelType: () => Promise<string>
   resizePanelWindow: (width: number, height: number) => Promise<void>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>

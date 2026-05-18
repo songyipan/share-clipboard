@@ -12,6 +12,7 @@ export const IPC_CHANNELS = {
   PANEL_SHOW: 'panel:show',
   PANEL_HIDE: 'panel:hide',
   PANEL_TYPE: 'panel:type',
+  PANEL_CURRENT: 'panel:current',
   PANEL_RESIZE: 'panel:resize',
   EXTERNAL_OPEN: 'external:open'
 } as const

@@ -19,6 +19,75 @@ interface ToolbarProps {
   codeCardConfig: ReturnType<typeof useCodeCardConfig>
 }
 
+function PreviewControls({
+  previewTheme,
+  onThemeChange
+}: {
+  previewTheme: PreviewTheme
+  onThemeChange: (theme: PreviewTheme) => void
+}): React.JSX.Element {
+  return (
+    <Select value={previewTheme} onValueChange={(value) => onThemeChange(value as PreviewTheme)}>
+      <SelectTrigger className="h-7 w-24 text-xs">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {(Object.keys(PREVIEW_THEMES) as PreviewTheme[]).map((key) => (
+          <SelectItem key={key} value={key}>
+            {PREVIEW_THEMES[key].label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
+function EditControls({
+  selectedLanguage,
+  onLanguageChange
+}: {
+  selectedLanguage: string
+  onLanguageChange: (lang: string) => void
+}): React.JSX.Element {
+  return (
+    <Select value={selectedLanguage} onValueChange={onLanguageChange}>
+      <SelectTrigger className="h-7 w-28 text-xs">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {PROGRAMMING_LANGUAGES.map((lang) => (
+          <SelectItem key={lang.value} value={lang.value}>
+            {lang.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
+function CodeCardControls({
+  codeCardConfig
+}: {
+  codeCardConfig: ReturnType<typeof useCodeCardConfig>
+}): React.JSX.Element {
+  const handleExport = async (): Promise<void> => {
+    const element = document.getElementById('code-card')
+    if (element) {
+      await exportAsImage(element, 'code-card.png')
+    }
+  }
+
+  return (
+    <ConfigPanel
+      config={codeCardConfig}
+      onThemeChange={codeCardConfig.setTheme}
+      onWindowThemeChange={codeCardConfig.setWindowTheme}
+      onBackgroundColorChange={codeCardConfig.setBackgroundColor}
+      onExport={handleExport}
+    />
+  )
+}
+
 export function ImagePanelToolbar({
   activeTab,
   previewTheme,
@@ -29,13 +98,6 @@ export function ImagePanelToolbar({
 }: ToolbarProps): React.JSX.Element {
   const { t } = useI18n()
 
-  const handleExport = async (): Promise<void> => {
-    const element = document.getElementById('code-card')
-    if (element) {
-      await exportAsImage(element, 'code-card.png')
-    }
-  }
-
   return (
     <div className="flex items-center justify-between shrink-0 gap-2">
       <TabsList>
@@ -45,42 +107,12 @@ export function ImagePanelToolbar({
       </TabsList>
       <div className="flex items-center gap-2">
         {activeTab === 'preview' && (
-          <Select value={previewTheme} onValueChange={(v) => onThemeChange(v as PreviewTheme)}>
-            <SelectTrigger className="w-24 h-7 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(PREVIEW_THEMES) as PreviewTheme[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {PREVIEW_THEMES[key].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <PreviewControls previewTheme={previewTheme} onThemeChange={onThemeChange} />
         )}
         {activeTab === 'edit' && (
-          <Select value={selectedLanguage} onValueChange={onLanguageChange}>
-            <SelectTrigger className="w-28 h-7 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PROGRAMMING_LANGUAGES.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value}>
-                  {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <EditControls selectedLanguage={selectedLanguage} onLanguageChange={onLanguageChange} />
         )}
-        {activeTab === 'code-card' && (
-          <ConfigPanel
-            config={codeCardConfig}
-            onThemeChange={codeCardConfig.setTheme}
-            onWindowThemeChange={codeCardConfig.setWindowTheme}
-            onBackgroundColorChange={codeCardConfig.setBackgroundColor}
-            onExport={handleExport}
-          />
-        )}
+        {activeTab === 'code-card' && <CodeCardControls codeCardConfig={codeCardConfig} />}
       </div>
     </div>
   )

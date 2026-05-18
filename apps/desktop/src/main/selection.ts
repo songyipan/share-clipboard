@@ -5,6 +5,7 @@ import { delay } from './utils/async'
 
 const MIN_TEXT_LENGTH = 1
 const MAX_TEXT_LENGTH = 500
+const SHORTCUT_RELEASE_DELAY_MS = 150
 const COPY_DELAY_MS = 100
 const COPY_TIMEOUT_MS = 500
 const COPY_POLL_INTERVAL_MS = 50
@@ -20,6 +21,7 @@ export async function captureSelection(): Promise<SelectionResult> {
 
   try {
     clipboard.clear()
+    await delay(SHORTCUT_RELEASE_DELAY_MS)
     await simulateCopy()
     const selectedText = await waitForSelectedText()
 
@@ -27,7 +29,7 @@ export async function captureSelection(): Promise<SelectionResult> {
       return { success: false, text: '' }
     }
 
-    return { success: true, text: selectedText.trim() }
+    return { success: true, text: selectedText }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return { success: false, text: '', error: message }

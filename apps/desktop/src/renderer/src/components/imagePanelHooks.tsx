@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { IPC_CHANNELS } from '../../../shared/ipc'
 import type { PreviewTheme } from './imagePanelConstants'
+
+interface SelectionResultPayload {
+  success: boolean
+  text?: string
+}
 
 export function useSelectedText(): string {
   const [text, setText] = useState('')
@@ -9,8 +15,17 @@ export function useSelectedText(): string {
     window.api.getLastSelectedText().then((t) => {
       if (!cancelled) setText(t)
     })
+
+    const handler = (_event: Electron.IpcRendererEvent, result: SelectionResultPayload): void => {
+      if (result.success && typeof result.text === 'string') {
+        setText(result.text)
+      }
+    }
+
+    window.electron.ipcRenderer.on(IPC_CHANNELS.SELECTION_RESULT, handler)
     return () => {
       cancelled = true
+      window.electron.ipcRenderer.removeListener(IPC_CHANNELS.SELECTION_RESULT, handler)
     }
   }, [])
 
@@ -59,7 +74,7 @@ export function useImagePanelState(): ImagePanelState & {
   setPreviewTheme: (theme: PreviewTheme) => void
   setSelectedLanguage: (lang: string) => void
 } {
-  const [activeTab, setActiveTab] = useState('preview')
+  const [activeTab, setActiveTab] = useState('edit')
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>('light')
   const [selectedLanguage, setSelectedLanguage] = useState('plaintext')
 

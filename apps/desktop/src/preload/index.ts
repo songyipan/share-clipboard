@@ -13,6 +13,7 @@ const api = {
   // 面板相关
   showPanel: (type: string) => ipcRenderer.invoke(IPC_CHANNELS.PANEL_SHOW, type),
   hidePanel: () => ipcRenderer.invoke(IPC_CHANNELS.PANEL_HIDE),
+  getCurrentPanelType: () => ipcRenderer.invoke(IPC_CHANNELS.PANEL_CURRENT),
   resizePanelWindow: (width: number, height: number) =>
     ipcRenderer.invoke(IPC_CHANNELS.PANEL_RESIZE, width, height),
 

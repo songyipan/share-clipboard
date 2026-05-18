@@ -1,10 +1,22 @@
 export type CodeCardTheme =
+  | 'andromeeda'
+  | 'catppuccin-mocha'
+  | 'dark-plus'
   | 'dracula'
   | 'github-dark'
   | 'github-light'
+  | 'gruvbox-dark'
+  | 'material-theme'
+  | 'min-dark'
   | 'monokai'
+  | 'night-owl'
+  | 'nord'
+  | 'one-dark-pro'
+  | 'rose-pine'
   | 'solarized-dark'
   | 'solarized-light'
+  | 'tokyo-night'
+  | 'vitesse-dark'
 
 export type WindowTheme = 'none' | 'macos' | 'windows'
 
@@ -16,15 +28,88 @@ export interface CodeCardConfig {
   showLineNumbers: boolean
 }
 
-export const CODE_CARD_THEMES: Record<CodeCardTheme, { label: string; bg: string; text: string }> =
-  {
-    dracula: { label: 'Dracula', bg: '#282a36', text: '#f8f8f2' },
-    'github-dark': { label: 'GitHub Dark', bg: '#0d1117', text: '#c9d1d9' },
-    'github-light': { label: 'GitHub Light', bg: '#ffffff', text: '#24292e' },
-    monokai: { label: 'Monokai', bg: '#272822', text: '#f8f8f2' },
-    'solarized-dark': { label: 'Solarized Dark', bg: '#002b36', text: '#839496' },
-    'solarized-light': { label: 'Solarized Light', bg: '#fdf6e3', text: '#657b83' }
+interface CodeCardThemeConfig {
+  label: string
+  bg: string
+  text: string
+  shikiTheme: string
+}
+
+export const CODE_CARD_THEMES: Record<CodeCardTheme, CodeCardThemeConfig> = {
+  andromeeda: {
+    label: 'Andromeeda',
+    bg: '#23262e',
+    text: '#d5ced9',
+    shikiTheme: 'andromeeda'
+  },
+  'catppuccin-mocha': {
+    label: 'Catppuccin Mocha',
+    bg: '#1e1e2e',
+    text: '#cdd6f4',
+    shikiTheme: 'catppuccin-mocha'
+  },
+  'dark-plus': { label: 'Dark+', bg: '#1e1e1e', text: '#d4d4d4', shikiTheme: 'dark-plus' },
+  dracula: { label: 'Dracula', bg: '#282a36', text: '#f8f8f2', shikiTheme: 'dracula' },
+  'github-dark': {
+    label: 'GitHub Dark',
+    bg: '#0d1117',
+    text: '#c9d1d9',
+    shikiTheme: 'github-dark'
+  },
+  'github-light': {
+    label: 'GitHub Light',
+    bg: '#ffffff',
+    text: '#24292e',
+    shikiTheme: 'github-light'
+  },
+  'gruvbox-dark': {
+    label: 'Gruvbox Dark',
+    bg: '#282828',
+    text: '#ebdbb2',
+    shikiTheme: 'gruvbox-dark-medium'
+  },
+  'material-theme': {
+    label: 'Material Theme',
+    bg: '#263238',
+    text: '#eeffff',
+    shikiTheme: 'material-theme'
+  },
+  'min-dark': { label: 'Min Dark', bg: '#1f1f1f', text: '#b392f0', shikiTheme: 'min-dark' },
+  monokai: { label: 'Monokai', bg: '#272822', text: '#f8f8f2', shikiTheme: 'monokai' },
+  'night-owl': { label: 'Night Owl', bg: '#011627', text: '#d6deeb', shikiTheme: 'night-owl' },
+  nord: { label: 'Nord', bg: '#2e3440', text: '#d8dee9', shikiTheme: 'nord' },
+  'one-dark-pro': {
+    label: 'One Dark Pro',
+    bg: '#282c34',
+    text: '#abb2bf',
+    shikiTheme: 'one-dark-pro'
+  },
+  'rose-pine': { label: 'Rosé Pine', bg: '#191724', text: '#e0def4', shikiTheme: 'rose-pine' },
+  'solarized-dark': {
+    label: 'Solarized Dark',
+    bg: '#002b36',
+    text: '#839496',
+    shikiTheme: 'solarized-dark'
+  },
+  'solarized-light': {
+    label: 'Solarized Light',
+    bg: '#fdf6e3',
+    text: '#657b83',
+    shikiTheme: 'solarized-light'
+  },
+  'tokyo-night': {
+    label: 'Tokyo Night',
+    bg: '#1a1b26',
+    text: '#a9b1d6',
+    shikiTheme: 'tokyo-night'
+  },
+  'vitesse-dark': {
+    label: 'Vitesse Dark',
+    bg: '#121212',
+    text: '#dbd7ca',
+    shikiTheme: 'vitesse-dark'
   }
+}
 
 export const WINDOW_THEMES: Record<WindowTheme, { label: string }> = {
   none: { label: '无' },

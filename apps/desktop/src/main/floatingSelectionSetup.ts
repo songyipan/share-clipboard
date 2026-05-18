@@ -12,7 +12,8 @@ import {
   showPanelWindow,
   hidePanelWindow,
   loadPanelWindowContent,
-  getPanelWindow
+  getPanelWindow,
+  getCurrentPanelType
 } from './panelWindow'
 import {
   startSelectionListener,
@@ -49,6 +50,12 @@ function initializeFloatingBall(): void {
   startSelectionListener(handleSelectionTrigger)
 }
 
+function sendSelectionResultToPanel(result: SelectionResult): void {
+  const panelWindow = getPanelWindow()
+  if (!panelWindow || panelWindow.isDestroyed()) return
+  panelWindow.webContents.send(IPC_CHANNELS.SELECTION_RESULT, result)
+}
+
 async function handleSelectionTrigger(): Promise<void> {
   const now = Date.now()
   const position = getCursorPosition()
@@ -61,6 +68,7 @@ async function handleSelectionTrigger(): Promise<void> {
     lastTriggerTime = now
 
     lastSelectionText = result.text || ''
+    sendSelectionResultToPanel(result)
     pendingSelectionResult = result
     showFloatingWindow(position.x, position.y)
     flushPendingSelectionResult()
@@ -140,12 +148,19 @@ function registerIpcHandlers(): void {
     if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
       const [x, y] = floatingWindow.getPosition()
       showPanelWindow(x, y, type)
+      if (lastSelectionText) {
+        setTimeout(() => {
+          sendSelectionResultToPanel({ success: true, text: lastSelectionText })
+        }, 100)
+      }
     }
   })
 
   ipcMain.handle(IPC_CHANNELS.PANEL_HIDE, () => {
     hidePanelWindow()
   })
+
+  ipcMain.handle(IPC_CHANNELS.PANEL_CURRENT, () => getCurrentPanelType())
 }
 
 export function registerIpcAndStartFloatingBall(): void {

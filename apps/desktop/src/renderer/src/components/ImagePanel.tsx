@@ -1,6 +1,7 @@
 import MDEditor from '@uiw/react-md-editor'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
+import remarkBreaks from 'remark-breaks'
 import { Tabs, TabsContent } from '@share-clipboard/ui/components/tabs'
 import { CodeCard, useCodeCardConfig } from './CodeCard'
 import { wrapCodeWithLanguage } from './imagePanelCode'
@@ -50,6 +51,7 @@ export function ImagePanel(): React.JSX.Element {
           <TabsContent value="preview" className="flex-1 min-h-0 mt-2">
             <div className="w-full h-full rounded-md border border-input overflow-auto">
               <MDEditor.Markdown
+                remarkPlugins={[remarkBreaks]}
                 source={content}
                 className="p-4 !bg-transparent"
                 style={{ background: 'transparent' }}

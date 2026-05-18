@@ -3,6 +3,7 @@ import { join } from 'path'
 import { IPC_CHANNELS } from './utils/platform'
 
 let panelWindow: BrowserWindow | null = null
+let currentPanelType = 'search'
 
 interface PanelSize {
   width: number
@@ -18,6 +19,15 @@ const PANEL_SIZES: Record<string, PanelSize> = {
 
 function getPanelSize(type: string): PanelSize {
   return PANEL_SIZES[type] ?? DEFAULT_PANEL_SIZE
+}
+
+export function getCurrentPanelType(): string {
+  return currentPanelType
+}
+
+function sendCurrentPanelType(): void {
+  if (!panelWindow || panelWindow.isDestroyed()) return
+  panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, currentPanelType)
 }
 
 /**
@@ -71,6 +81,8 @@ export function showPanelWindow(
   floatingY: number,
   type: string = 'search'
 ): void {
+  currentPanelType = type
+
   if (!panelWindow || panelWindow.isDestroyed()) {
     panelWindow = createPanelWindow()
     loadPanelWindowContent()
@@ -98,13 +110,13 @@ export function showPanelWindow(
   )
   if (panelWindow.webContents.isLoading()) {
     panelWindow.webContents.once('did-finish-load', () => {
-      console.log('[PanelWindow] did-finish-load, sending IPC with type:', type)
-      panelWindow?.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+      console.log('[PanelWindow] did-finish-load, sending IPC with type:', currentPanelType)
+      sendCurrentPanelType()
       panelWindow?.showInactive()
     })
   } else {
-    console.log('[PanelWindow] sending IPC immediately with type:', type)
-    panelWindow.webContents.send(IPC_CHANNELS.PANEL_TYPE, type)
+    console.log('[PanelWindow] sending IPC immediately with type:', currentPanelType)
+    sendCurrentPanelType()
     panelWindow.showInactive()
   }
 }
