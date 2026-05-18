@@ -27,6 +27,7 @@ import {
 } from './mouseListener'
 import { captureSelection, SelectionResult } from './selection'
 import { createTray, destroyTray } from './tray'
+import { IPC_CHANNELS } from '../shared/ipc'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -121,7 +122,7 @@ async function handleSelectionTrigger(): Promise<void> {
 function notifyRenderer(result: SelectionResult): void {
   const floatingWindow = getFloatingWindow()
   if (floatingWindow && !floatingWindow.isDestroyed()) {
-    floatingWindow.webContents.send('selection:result', result)
+    floatingWindow.webContents.send(IPC_CHANNELS.SELECTION_RESULT, result)
   }
 }
 
@@ -129,7 +130,7 @@ function notifyRenderer(result: SelectionResult): void {
  * 注册 IPC 处理器
  */
 function registerIpcHandlers(): void {
-  ipcMain.handle('floating:show', () => {
+  ipcMain.handle(IPC_CHANNELS.FLOATING_SHOW, () => {
     const position = getCursorPosition()
     showFloatingWindow(position.x, position.y)
   })
@@ -137,27 +138,27 @@ function registerIpcHandlers(): void {
   /**
    * 获取最后一次选中的文本
    */
-  ipcMain.handle('selection:last', () => lastSelectionText)
+  ipcMain.handle(IPC_CHANNELS.SELECTION_LAST, () => lastSelectionText)
 
-  ipcMain.handle('floating:hide', () => {
+  ipcMain.handle(IPC_CHANNELS.FLOATING_HIDE, () => {
     hideFloatingWindow()
   })
 
-  ipcMain.handle('selection:get', async () => {
+  ipcMain.handle(IPC_CHANNELS.SELECTION_GET, async () => {
     return captureSelection()
   })
 
-  ipcMain.handle('listener:status', () => isListenerActive())
-  ipcMain.handle('listener:shortcut', () => getCurrentShortcut())
+  ipcMain.handle(IPC_CHANNELS.LISTENER_STATUS, () => isListenerActive())
+  ipcMain.handle(IPC_CHANNELS.LISTENER_SHORTCUT, () => getCurrentShortcut())
 
-  ipcMain.handle('floating:resize', (_event, width: number, height: number) => {
+  ipcMain.handle(IPC_CHANNELS.FLOATING_RESIZE, (_event, width: number, height: number) => {
     const floatingWindow = getFloatingWindow()
     if (floatingWindow && !floatingWindow.isDestroyed()) {
       floatingWindow.setSize(Math.round(width), Math.round(height))
     }
   })
 
-  ipcMain.handle('panel:show', (_event, type: string) => {
+  ipcMain.handle(IPC_CHANNELS.PANEL_SHOW, (_event, type: string) => {
     console.log('[Main] panel:show received, type:', type)
     const floatingWindow = getFloatingWindow()
     if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
@@ -166,7 +167,7 @@ function registerIpcHandlers(): void {
     }
   })
 
-  ipcMain.handle('panel:hide', () => {
+  ipcMain.handle(IPC_CHANNELS.PANEL_HIDE, () => {
     hidePanelWindow()
   })
 }

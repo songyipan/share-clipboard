@@ -1,9 +1,10 @@
 import { forwardRef } from 'react'
 import { Button } from './ui/button'
 import { Search, NotebookText, ImageIcon, GripVertical, LucideIcon } from 'lucide-react'
+import { PANEL_TYPES, type PanelType } from '../utils/panel'
 
 interface FloatingBallContainerProps {
-  onAction: (action: number) => void
+  onAction: (type: PanelType) => void
 }
 
 export const FloatingBallContainer = forwardRef<HTMLDivElement, FloatingBallContainerProps>(
@@ -47,12 +48,12 @@ function DragHandle(): React.JSX.Element {
   )
 }
 
-function ActionButtons({ onAction }: { onAction: (action: number) => void }): React.JSX.Element {
+function ActionButtons({ onAction }: { onAction: (type: PanelType) => void }): React.JSX.Element {
   return (
     <div className="flex flex-row" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-      <ActionButton icon={Search} onClick={() => onAction(0)} />
-      <ActionButton icon={NotebookText} onClick={() => onAction(1)} />
-      <ActionButton icon={ImageIcon} onClick={() => onAction(2)} />
+      <ActionButton icon={Search} onClick={() => onAction(PANEL_TYPES.SEARCH)} />
+      <ActionButton icon={NotebookText} onClick={() => onAction(PANEL_TYPES.NOTEBOOK)} />
+      <ActionButton icon={ImageIcon} onClick={() => onAction(PANEL_TYPES.IMAGE)} />
     </div>
   )
 }
