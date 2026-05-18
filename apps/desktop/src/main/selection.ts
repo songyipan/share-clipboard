@@ -6,6 +6,8 @@ import { delay } from './utils/async'
 const MIN_TEXT_LENGTH = 1
 const MAX_TEXT_LENGTH = 500
 const COPY_DELAY_MS = 100
+const COPY_TIMEOUT_MS = 500
+const COPY_POLL_INTERVAL_MS = 50
 
 export interface SelectionResult {
   success: boolean
@@ -14,11 +16,12 @@ export interface SelectionResult {
 }
 
 export async function captureSelection(): Promise<SelectionResult> {
+  const clipboardBackup = backupClipboard()
+
   try {
-    const clipboardBackup = backupClipboard()
+    clipboard.clear()
     await simulateCopy()
-    const selectedText = readSelectedText()
-    restoreClipboard(clipboardBackup)
+    const selectedText = await waitForSelectedText()
 
     if (!isValidText(selectedText)) {
       return { success: false, text: '' }
@@ -28,6 +31,8 @@ export async function captureSelection(): Promise<SelectionResult> {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return { success: false, text: '', error: message }
+  } finally {
+    restoreClipboard(clipboardBackup)
   }
 }
 
@@ -43,7 +48,17 @@ async function simulateCopy(): Promise<void> {
   await delay(COPY_DELAY_MS)
 }
 
-function readSelectedText(): string {
+async function waitForSelectedText(): Promise<string> {
+  const deadline = Date.now() + COPY_TIMEOUT_MS
+
+  while (Date.now() < deadline) {
+    const text = clipboard.readText()
+    if (text.trim().length > 0) {
+      return text
+    }
+    await delay(COPY_POLL_INTERVAL_MS)
+  }
+
   return clipboard.readText()
 }
 

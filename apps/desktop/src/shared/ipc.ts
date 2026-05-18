@@ -5,6 +5,7 @@ export const IPC_CHANNELS = {
   FLOATING_SHOW: 'floating:show',
   FLOATING_HIDE: 'floating:hide',
   FLOATING_HIDDEN: 'floating:hidden',
+  FLOATING_READY: 'floating:ready',
   FLOATING_RESIZE: 'floating:resize',
   LISTENER_STATUS: 'listener:status',
   LISTENER_SHORTCUT: 'listener:shortcut',

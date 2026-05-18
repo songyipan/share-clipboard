@@ -72,7 +72,10 @@ function createWindow(): BrowserWindow {
  * 初始化悬浮球功能
  */
 function initializeFloatingBall(): void {
-  createFloatingWindow()
+  const floatingWindow = createFloatingWindow()
+  floatingWindow.webContents.on('did-start-loading', () => {
+    isFloatingRendererReady = false
+  })
   loadFloatingWindowContent()
   createPanelWindow()
   loadPanelWindowContent()
@@ -97,6 +100,9 @@ function initializeFloatingBall(): void {
  */
 let lastSelectionText: string = ''
 let lastTriggerTime: number = 0
+let isFloatingRendererReady = false
+let pendingSelectionResult: SelectionResult | null = null
+
 async function handleSelectionTrigger(): Promise<void> {
   const now = Date.now()
   const position = getCursorPosition()
@@ -111,18 +117,29 @@ async function handleSelectionTrigger(): Promise<void> {
 
     // 更新最后的选中文本，用于后续操作
     lastSelectionText = result.text || ''
+    pendingSelectionResult = result
     showFloatingWindow(position.x, position.y)
-    notifyRenderer(result)
+    flushPendingSelectionResult()
   }
 }
 
 /**
  * 通知悬浮球窗口选中的文本
  */
-function notifyRenderer(result: SelectionResult): void {
+function notifyRenderer(result: SelectionResult): boolean {
   const floatingWindow = getFloatingWindow()
-  if (floatingWindow && !floatingWindow.isDestroyed()) {
-    floatingWindow.webContents.send(IPC_CHANNELS.SELECTION_RESULT, result)
+  if (!floatingWindow || floatingWindow.isDestroyed() || !isFloatingRendererReady) {
+    return false
+  }
+
+  floatingWindow.webContents.send(IPC_CHANNELS.SELECTION_RESULT, result)
+  return true
+}
+
+function flushPendingSelectionResult(): void {
+  if (!pendingSelectionResult) return
+  if (notifyRenderer(pendingSelectionResult)) {
+    pendingSelectionResult = null
   }
 }
 
@@ -142,6 +159,11 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle(IPC_CHANNELS.FLOATING_HIDE, () => {
     hideFloatingWindow()
+  })
+
+  ipcMain.handle(IPC_CHANNELS.FLOATING_READY, () => {
+    isFloatingRendererReady = true
+    flushPendingSelectionResult()
   })
 
   ipcMain.handle(IPC_CHANNELS.SELECTION_GET, async () => {

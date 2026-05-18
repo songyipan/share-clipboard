@@ -3,6 +3,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 interface FloatingBallAPI {
   showFloatingBall: (text: string) => Promise<void>
   hideFloatingBall: () => Promise<void>
+  notifyFloatingReady: () => Promise<void>
   getSelectedText: () => Promise<{ success: boolean; text: string; error?: string }>
   showPanel: (type: string) => Promise<void>
   hidePanel: () => Promise<void>

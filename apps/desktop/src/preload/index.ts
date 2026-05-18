@@ -7,6 +7,7 @@ const api = {
   // 悬浮球相关
   showFloatingBall: (text: string) => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_SHOW, text),
   hideFloatingBall: () => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_HIDE),
+  notifyFloatingReady: () => ipcRenderer.invoke(IPC_CHANNELS.FLOATING_READY),
   getSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_GET),
 
   // 面板相关

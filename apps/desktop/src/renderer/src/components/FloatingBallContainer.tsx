@@ -1,14 +1,15 @@
 import { forwardRef } from 'react'
 import { Button } from './ui/button'
-import { Search, NotebookText, ImageIcon, GripVertical, LucideIcon } from 'lucide-react'
+import { Search, NotebookText, ImageIcon, GripVertical, X, LucideIcon } from 'lucide-react'
 import { PANEL_TYPES, type PanelType } from '../utils/panel'
 
 interface FloatingBallContainerProps {
   onAction: (type: PanelType) => void
+  onClose: () => void
 }
 
 export const FloatingBallContainer = forwardRef<HTMLDivElement, FloatingBallContainerProps>(
-  function FloatingBallContainer({ onAction }, ref): React.JSX.Element {
+  function FloatingBallContainer({ onAction, onClose }, ref): React.JSX.Element {
     return (
       <div
         className="inline-flex justify-center items-center"
@@ -31,6 +32,7 @@ export const FloatingBallContainer = forwardRef<HTMLDivElement, FloatingBallCont
         >
           <DragHandle />
           <ActionButtons onAction={onAction} />
+          <CloseButton onClose={onClose} />
         </div>
       </div>
     )
@@ -68,6 +70,22 @@ function ActionButton({
   return (
     <Button variant="ghost" size="icon-sm" className="rounded-full" onClick={onClick}>
       <Icon />
+    </Button>
+  )
+}
+
+function CloseButton({ onClose }: { onClose: () => void }): React.JSX.Element {
+  return (
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      className="rounded-full text-muted-foreground hover:text-foreground"
+      style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+      aria-label="关闭悬浮球"
+      title="关闭"
+      onClick={onClose}
+    >
+      <X />
     </Button>
   )
 }
