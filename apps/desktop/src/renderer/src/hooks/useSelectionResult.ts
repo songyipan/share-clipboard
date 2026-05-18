@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { IPC_CHANNELS } from '../../../shared/ipc'
 
 interface SelectionResult {
   success: boolean
@@ -18,16 +17,10 @@ export function useSelectionResult(onSuccess: () => void): void {
   }, [onSuccess])
 
   useEffect(() => {
-    const handler = (_event: Electron.IpcRendererEvent, result: SelectionResult): void => {
+    return window.api.onSelectionResult((result: SelectionResult) => {
       if (result.success) {
         onSuccessRef.current()
       }
-    }
-
-    window.electron.ipcRenderer.on(IPC_CHANNELS.SELECTION_RESULT, handler)
-
-    return () => {
-      window.electron.ipcRenderer.removeListener(IPC_CHANNELS.SELECTION_RESULT, handler)
-    }
+    })
   }, [])
 }

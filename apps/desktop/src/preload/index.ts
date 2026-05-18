@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IPC_CHANNELS } from '../shared/ipc'
 
+type SelectionResultPayload = { success: boolean; text: string; error?: string }
+
 // Custom APIs for renderer
 const api = {
   // 悬浮球相关
@@ -35,6 +37,14 @@ const api = {
   onFloatingBallHidden: (callback: () => void) => {
     ipcRenderer.on(IPC_CHANNELS.FLOATING_HIDDEN, callback)
     return () => ipcRenderer.removeListener(IPC_CHANNELS.FLOATING_HIDDEN, callback)
+  },
+
+  onSelectionResult: (callback: (result: SelectionResultPayload) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, result: SelectionResultPayload): void => {
+      callback(result)
+    }
+    ipcRenderer.on(IPC_CHANNELS.SELECTION_RESULT, handler)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.SELECTION_RESULT, handler)
   },
 
   // 调整悬浮球窗口大小

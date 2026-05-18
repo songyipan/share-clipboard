@@ -3,6 +3,11 @@ import { join } from 'path'
 import { IPC_CHANNELS } from '../shared/ipc'
 
 let floatingWindow: BrowserWindow | null = null
+let floatingWindowShownAt = 0
+
+export function getFloatingWindowShownAt(): number {
+  return floatingWindowShownAt
+}
 
 /**
  * 创建悬浮球窗口
@@ -65,6 +70,7 @@ export function showFloatingWindow(x: number, y: number): void {
   const bounds = safePosition(x, y)
   floatingWindow.setPosition(bounds.x, bounds.y)
 
+  floatingWindowShownAt = Date.now()
   // 只显示不聚焦，避免切换桌面
   floatingWindow.showInactive()
 }
