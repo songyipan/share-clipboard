@@ -24,6 +24,7 @@ import {
 } from './mouseListener'
 import { captureSelection, SelectionResult } from './selection'
 import { IPC_CHANNELS } from '../shared/ipc'
+import { bootstrapNotebookSubsystem } from './notes/notebookSubsystem'
 
 let lastSelectionText = ''
 let lastTriggerTime = 0
@@ -172,7 +173,8 @@ function registerIpcHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.PANEL_CURRENT, () => getCurrentPanelType())
 }
 
-export function registerIpcAndStartFloatingBall(): void {
+export async function registerIpcAndStartFloatingBall(): Promise<void> {
+  await bootstrapNotebookSubsystem()
   registerIpcHandlers()
   initializeFloatingBall()
 }

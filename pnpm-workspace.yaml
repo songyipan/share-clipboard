@@ -5,3 +5,6 @@ packages:
 onlyBuiltDependencies:
   - "electron"
   - "esbuild"
+  - "prisma"
+  - "@prisma/client"
+  - "better-sqlite3"

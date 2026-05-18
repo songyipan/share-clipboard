@@ -3,25 +3,62 @@ import { Button } from '@share-clipboard/ui/components/button'
 import { Eye, EyeOff } from 'lucide-react'
 import { MarkdownPreviewThemeSelect, type PreviewTheme } from '../markdown'
 
-interface NotebookPanelToolbarProps {
+import type { NotebookToolbarNoteActionsProps } from './NotebookToolbarNoteActions'
+import { NotebookToolbarNoteActions } from './NotebookToolbarNoteActions'
+
+export interface NotebookPanelToolbarProps extends NotebookToolbarNoteActionsProps {
   previewOpen: boolean
   onPreviewOpenChange: (open: boolean) => void
   previewTheme: PreviewTheme
   onPreviewThemeChange: (theme: PreviewTheme) => void
+  saving: boolean
 }
 
 export function NotebookPanelToolbar({
   previewOpen,
   onPreviewOpenChange,
   previewTheme,
-  onPreviewThemeChange
+  onPreviewThemeChange,
+  saving,
+  ...noteActions
 }: NotebookPanelToolbarProps): React.JSX.Element {
+  return (
+    <div className="flex flex-col gap-2 shrink-0">
+      <NotebookToolbarTopRow
+        previewOpen={previewOpen}
+        onPreviewOpenChange={onPreviewOpenChange}
+        previewTheme={previewTheme}
+        onPreviewThemeChange={onPreviewThemeChange}
+        saving={saving}
+      />
+      <NotebookToolbarNoteActions {...noteActions} />
+    </div>
+  )
+}
+
+function NotebookToolbarTopRow({
+  previewOpen,
+  onPreviewOpenChange,
+  previewTheme,
+  onPreviewThemeChange,
+  saving
+}: Pick<
+  NotebookPanelToolbarProps,
+  'previewOpen' | 'onPreviewOpenChange' | 'previewTheme' | 'onPreviewThemeChange' | 'saving'
+>): React.JSX.Element {
   const { t } = useI18n()
 
   return (
-    <div className="flex items-center justify-between shrink-0 gap-2">
-      <div className="text-xs text-muted-foreground font-medium">{t('panel.notebookTitle')}</div>
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between gap-2 flex-wrap">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground font-medium shrink-0">
+          {t('panel.notebookTitle')}
+        </span>
+        {saving ? (
+          <span className="text-[10px] text-muted-foreground">{t('panel.noteSaving')}</span>
+        ) : null}
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
         {previewOpen ? (
           <MarkdownPreviewThemeSelect value={previewTheme} onValueChange={onPreviewThemeChange} />
         ) : null}

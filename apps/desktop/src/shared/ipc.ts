@@ -14,5 +14,12 @@ export const IPC_CHANNELS = {
   PANEL_TYPE: 'panel:type',
   PANEL_CURRENT: 'panel:current',
   PANEL_RESIZE: 'panel:resize',
-  EXTERNAL_OPEN: 'external:open'
+  EXTERNAL_OPEN: 'external:open',
+  NOTES_LIST: 'notes:list',
+  NOTES_GET: 'notes:get',
+  NOTES_CREATE: 'notes:create',
+  NOTES_UPDATE: 'notes:update',
+  NOTES_DELETE: 'notes:delete',
+  NOTES_EXPORT_PDF: 'notes:export:pdf',
+  NOTES_EXPORT_DOCX: 'notes:export:docx'
 } as const

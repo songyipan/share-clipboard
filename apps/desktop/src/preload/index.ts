@@ -1,6 +1,14 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+
 import { IPC_CHANNELS } from '../shared/ipc'
+import type {
+  NoteDto,
+  NoteExportResultDto,
+  NoteSummaryDto,
+  NotesCreatePayload,
+  NotesUpdatePayload
+} from '../shared/notes/types'
 
 type SelectionResultPayload = { success: boolean; text: string; error?: string }
 
@@ -55,7 +63,21 @@ const api = {
   getLastSelectedText: () => ipcRenderer.invoke(IPC_CHANNELS.SELECTION_LAST),
 
   // 打开外部链接
-  openExternal: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.EXTERNAL_OPEN, url)
+  openExternal: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.EXTERNAL_OPEN, url),
+
+  notes: {
+    list: (): Promise<NoteSummaryDto[]> => ipcRenderer.invoke(IPC_CHANNELS.NOTES_LIST),
+    get: (id: string): Promise<NoteDto | null> => ipcRenderer.invoke(IPC_CHANNELS.NOTES_GET, id),
+    create: (payload?: NotesCreatePayload): Promise<NoteDto> =>
+      ipcRenderer.invoke(IPC_CHANNELS.NOTES_CREATE, payload ?? {}),
+    update: (id: string, payload: NotesUpdatePayload): Promise<NoteDto | null> =>
+      ipcRenderer.invoke(IPC_CHANNELS.NOTES_UPDATE, id, payload),
+    remove: (id: string): Promise<boolean> => ipcRenderer.invoke(IPC_CHANNELS.NOTES_DELETE, id),
+    exportPdf: (id: string): Promise<NoteExportResultDto> =>
+      ipcRenderer.invoke(IPC_CHANNELS.NOTES_EXPORT_PDF, id),
+    exportDocx: (id: string): Promise<NoteExportResultDto> =>
+      ipcRenderer.invoke(IPC_CHANNELS.NOTES_EXPORT_DOCX, id)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -1,5 +1,23 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 
+import type {
+  NoteDto,
+  NoteExportResultDto,
+  NoteSummaryDto,
+  NotesCreatePayload,
+  NotesUpdatePayload
+} from '../shared/notes/types'
+
+interface NotesApi {
+  list: () => Promise<NoteSummaryDto[]>
+  get: (id: string) => Promise<NoteDto | null>
+  create: (payload?: NotesCreatePayload) => Promise<NoteDto>
+  update: (id: string, payload: NotesUpdatePayload) => Promise<NoteDto | null>
+  remove: (id: string) => Promise<boolean>
+  exportPdf: (id: string) => Promise<NoteExportResultDto>
+  exportDocx: (id: string) => Promise<NoteExportResultDto>
+}
+
 interface FloatingBallAPI {
   showFloatingBall: (text: string) => Promise<void>
   hideFloatingBall: () => Promise<void>
@@ -19,6 +37,7 @@ interface FloatingBallAPI {
   resizeFloatingWindow: (width: number, height: number) => Promise<void>
   getLastSelectedText: () => Promise<string>
   openExternal: (url: string) => Promise<void>
+  notes: NotesApi
 }
 
 declare global {
@@ -27,3 +46,5 @@ declare global {
     api: FloatingBallAPI
   }
 }
+
+export {}

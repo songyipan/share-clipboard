@@ -1,38 +1,161 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
+
+import type { TFunction } from '@share-clipboard/i18n'
+import { useI18n } from '@share-clipboard/i18n'
+
 import { useDarkMode } from '../../hooks/useDarkMode'
-import { MarkdownEditor, MarkdownPreview, MarkdownSplitRow, type PreviewTheme } from '../markdown'
-import { useSelectedText, useSyncEditWithSelected } from '../image-panel/imagePanelHooks'
+import { useSelectedText } from '../image-panel/imagePanelHooks'
+import { type PreviewTheme } from '../markdown'
+import { NotebookEntryGate } from './NotebookEntryGate'
+import { NotebookNoteList } from './NotebookNoteList'
 import { NotebookPanelToolbar } from './NotebookPanelToolbar'
+import { useNotebookExportActions } from './useNotebookExportActions'
+import { useNotebookPanelEntry } from './useNotebookPanelEntry'
+import { useNotebookWorkspace } from './useNotebookWorkspace'
+import { NotebookWorkspaceEditor } from './NotebookWorkspaceEditor'
+import type { NotebookWorkspaceHandlers } from './notebookWorkspaceTypes'
 
 export function NotebookPanel(): React.JSX.Element {
+  const { t } = useI18n()
   const lastSelectedText = useSelectedText()
-  const [editText, setEditText] = useSyncEditWithSelected(lastSelectedText)
+  const nb = useNotebookWorkspace()
+  const entry = useNotebookPanelEntry(nb, t)
   const [previewOpen, setPreviewOpen] = useState(true)
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>('light')
   const isDark = useDarkMode()
 
+  const previewSource = useMemo(
+    () => (nb.activeId ? nb.draftBody : ''),
+    [nb.activeId, nb.draftBody]
+  )
+  const canInsertSelection = !!lastSelectedText.trim()
   const colorMode = previewOpen ? previewTheme : isDark ? 'dark' : 'light'
-  const previewSource = editText || lastSelectedText
+
+  const exports = useNotebookExportActions(
+    nb.activeId,
+    nb.draftBody,
+    nb.flushNow,
+    nb.changeDraftBody,
+    lastSelectedText,
+    t
+  )
 
   return (
-    <div className="w-full h-full flex flex-col bg-background" data-color-mode={colorMode}>
+    <div className="relative w-full h-full flex flex-col bg-background" data-color-mode={colorMode}>
       <div
         className="flex items-center h-10 px-3 pt-2 shrink-0"
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+        style={{ WebkitAppRegion: 'drag' } as CSSProperties}
       />
-      <div className="flex-1 flex flex-col min-h-0 px-3 pb-3 gap-2">
-        <NotebookPanelToolbar
+      <div className="flex-1 flex min-h-0 px-3 pb-3 gap-2">
+        <aside className="w-36 shrink-0 flex flex-col border border-border rounded-md p-2 min-h-0">
+          <NotebookNoteList
+            notes={nb.notes}
+            activeId={nb.activeId}
+            onSelect={(id) => void nb.selectNote(id)}
+            className="flex-1"
+          />
+        </aside>
+
+        <NotebookMainColumn
+          nb={nb}
           previewOpen={previewOpen}
-          onPreviewOpenChange={setPreviewOpen}
+          setPreviewOpen={setPreviewOpen}
           previewTheme={previewTheme}
-          onPreviewThemeChange={setPreviewTheme}
-        />
-        <MarkdownSplitRow
-          showPreview={previewOpen}
-          editor={<MarkdownEditor value={editText} onChange={setEditText} />}
-          preview={<MarkdownPreview source={previewSource} />}
+          setPreviewTheme={setPreviewTheme}
+          exportHint={exports.exportHint}
+          canInsertSelection={canInsertSelection}
+          previewSource={previewSource}
+          t={t}
+          onExportPdf={() => void exports.exportPdf()}
+          onExportDocx={() => void exports.exportDocx()}
+          onInsertSelection={exports.insertSelection}
         />
       </div>
+
+      {!entry.workspaceReady ? (
+        <NotebookEntryGate
+          step={entry.gateStep}
+          remark={entry.remark}
+          busy={entry.gateBusy}
+          onRemarkChange={entry.setRemark}
+          onEditLater={entry.onEditLater}
+          onEditNow={entry.onEditNow}
+          onBack={entry.onBackFromLater}
+          onSaveToList={() => void entry.onSaveToList()}
+          t={t}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+interface NotebookMainColumnProps {
+  nb: NotebookWorkspaceHandlers
+  previewOpen: boolean
+  setPreviewOpen: (v: boolean) => void
+  previewTheme: PreviewTheme
+  setPreviewTheme: (v: PreviewTheme) => void
+  exportHint: string
+  canInsertSelection: boolean
+  previewSource: string
+  t: TFunction
+  onExportPdf: () => void
+  onExportDocx: () => void
+  onInsertSelection: () => void
+}
+
+function NotebookMainColumn({
+  nb,
+  previewOpen,
+  setPreviewOpen,
+  previewTheme,
+  setPreviewTheme,
+  exportHint,
+  canInsertSelection,
+  previewSource,
+  t,
+  onExportPdf,
+  onExportDocx,
+  onInsertSelection
+}: NotebookMainColumnProps): React.JSX.Element {
+  return (
+    <div className="flex-1 flex flex-col min-w-0 gap-2">
+      <NotebookPanelToolbar
+        previewOpen={previewOpen}
+        onPreviewOpenChange={setPreviewOpen}
+        previewTheme={previewTheme}
+        onPreviewThemeChange={setPreviewTheme}
+        hasActiveNote={!!nb.activeId}
+        saving={nb.saving}
+        draftTitle={nb.draftTitle}
+        onDraftTitleChange={nb.changeDraftTitle}
+        onNewNote={() => void nb.addNote()}
+        onDeleteNote={() => void nb.removeActiveNote()}
+        onExportPdf={onExportPdf}
+        onExportDocx={onExportDocx}
+        onInsertSelection={onInsertSelection}
+        canInsertSelection={canInsertSelection}
+      />
+
+      {exportHint ? (
+        <p className="text-[10px] text-muted-foreground truncate" role="status">
+          {exportHint}
+        </p>
+      ) : null}
+
+      {!nb.activeId ? (
+        <div className="flex flex-1 min-h-[120px] items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground px-4 text-center">
+          {nb.notes.length === 0 ? t('panel.noNotesYet') : t('panel.pickOrCreateNote')}
+        </div>
+      ) : (
+        <NotebookWorkspaceEditor
+          showPreview={previewOpen}
+          draftBody={nb.draftBody}
+          previewSource={previewSource}
+          onBodyChange={nb.changeDraftBody}
+        />
+      )}
     </div>
   )
 }

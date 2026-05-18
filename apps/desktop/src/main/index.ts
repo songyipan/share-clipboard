@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import { disconnectNotebookPrisma } from './db/notebookPrisma'
 import { stopSelectionListener } from './mouseListener'
 import { createTray, destroyTray } from './tray'
 import { registerIpcAndStartFloatingBall } from './floatingSelectionSetup'
@@ -58,7 +59,11 @@ function showMainWindow(): void {
   }
 }
 
-app.whenReady().then(() => {
+app.on('will-quit', () => {
+  void disconnectNotebookPrisma()
+})
+
+app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.electron')
 
   if (process.platform === 'darwin' && app.dock) {
@@ -69,7 +74,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  registerIpcAndStartFloatingBall()
+  await registerIpcAndStartFloatingBall()
   createTray(showMainWindow)
 
   app.on('activate', function () {

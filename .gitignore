@@ -33,6 +33,14 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+!apps/desktop/.env.example
+
+# Prisma local databases (CLI / dev only)
+**/prisma/*.db
+**/prisma/*.db-journal
+
+# Prisma 7 generated client (regenerated via pnpm db:generate)
+apps/desktop/src/generated/prisma/
 
 # Test
 coverage
