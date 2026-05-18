@@ -45,6 +45,7 @@
     "preview": "预览",
     "edit": "编辑",
     "codeCard": "分享卡片",
+    "plainText": "纯文本",
     "hidePreview": "隐藏预览",
     "showPreview": "显示预览"
   },
@@ -52,5 +53,19 @@
     "dragToMove": "拖动移动",
     "closeFloatingBall": "关闭悬浮球",
     "close": "关闭"
+  },
+  "codeCard": {
+    "windowTheme": {
+      "none": "无",
+      "macos": "macOS",
+      "windows": "Windows"
+    },
+    "background": {
+      "default": "默认",
+      "blue": "蓝色",
+      "red": "红色",
+      "green": "绿色",
+      "purple": "紫色"
+    }
   }
 }

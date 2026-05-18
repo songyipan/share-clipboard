@@ -28,6 +28,8 @@ function EditControls({
   selectedLanguage: string
   onLanguageChange: (lang: string) => void
 }): React.JSX.Element {
+  const { t } = useI18n()
+
   return (
     <Select value={selectedLanguage} onValueChange={onLanguageChange}>
       <SelectTrigger className="h-7 w-28 text-xs">
@@ -36,7 +38,7 @@ function EditControls({
       <SelectContent>
         {PROGRAMMING_LANGUAGES.map((lang) => (
           <SelectItem key={lang.value} value={lang.value}>
-            {lang.label}
+            {lang.labelKey ? t(lang.labelKey) : lang.label}
           </SelectItem>
         ))}
       </SelectContent>

@@ -6,8 +6,14 @@ import {
   SelectTrigger,
   SelectValue
 } from '@share-clipboard/ui/components/select'
+import { useI18n } from '@share-clipboard/i18n'
 import type { CodeCardConfig, CodeCardTheme, WindowTheme } from './types'
-import { CODE_CARD_THEMES, WINDOW_THEMES, BACKGROUND_COLORS } from './types'
+import {
+  BACKGROUND_COLORS,
+  CODE_CARD_THEMES,
+  WINDOW_THEME_KEYS,
+  WINDOW_THEME_LABEL_KEYS
+} from './types'
 
 interface ConfigPanelProps {
   config: CodeCardConfig
@@ -24,6 +30,8 @@ export function ConfigPanel({
   onBackgroundColorChange,
   onExport
 }: ConfigPanelProps): React.JSX.Element {
+  const { t } = useI18n()
+
   return (
     <div className="flex items-center gap-2 flex-wrap">
       <Select value={config.theme} onValueChange={onThemeChange as (v: string) => void}>
@@ -44,9 +52,9 @@ export function ConfigPanel({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {(Object.keys(WINDOW_THEMES) as WindowTheme[]).map((theme) => (
+          {WINDOW_THEME_KEYS.map((theme) => (
             <SelectItem key={theme} value={theme}>
-              {WINDOW_THEMES[theme].label}
+              {t(WINDOW_THEME_LABEL_KEYS[theme])}
             </SelectItem>
           ))}
         </SelectContent>
@@ -61,9 +69,9 @@ export function ConfigPanel({
           <SelectValue placeholder="背景" />
         </SelectTrigger>
         <SelectContent>
-          {BACKGROUND_COLORS.map((bg, idx) => (
-            <SelectItem key={idx} value={bg.value}>
-              {bg.label}
+          {BACKGROUND_COLORS.map((bg) => (
+            <SelectItem key={bg.value} value={bg.value}>
+              {t(bg.labelKey)}
             </SelectItem>
           ))}
         </SelectContent>

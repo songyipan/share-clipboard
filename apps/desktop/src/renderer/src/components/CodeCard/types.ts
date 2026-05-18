@@ -1,3 +1,5 @@
+import type { I18nKey } from '@share-clipboard/i18n'
+
 export type CodeCardTheme =
   | 'andromeeda'
   | 'catppuccin-mocha'
@@ -111,16 +113,33 @@ export const CODE_CARD_THEMES: Record<CodeCardTheme, CodeCardThemeConfig> = {
   }
 }
 
-export const WINDOW_THEMES: Record<WindowTheme, { label: string }> = {
-  none: { label: '无' },
-  macos: { label: 'macOS' },
-  windows: { label: 'Windows' }
+export const WINDOW_THEME_KEYS: WindowTheme[] = ['none', 'macos', 'windows']
+
+export const WINDOW_THEME_LABEL_KEYS: Record<WindowTheme, I18nKey> = {
+  none: 'codeCard.windowTheme.none',
+  macos: 'codeCard.windowTheme.macos',
+  windows: 'codeCard.windowTheme.windows'
 }
 
-export const BACKGROUND_COLORS = [
-  { label: '默认', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { label: '蓝色', value: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)' },
-  { label: '红色', value: 'linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%)' },
-  { label: '绿色', value: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
-  { label: '紫色', value: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' }
+export const BACKGROUND_COLORS: Array<{ labelKey: I18nKey; value: string }> = [
+  {
+    labelKey: 'codeCard.background.default',
+    value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+  },
+  {
+    labelKey: 'codeCard.background.blue',
+    value: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)'
+  },
+  {
+    labelKey: 'codeCard.background.red',
+    value: 'linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%)'
+  },
+  {
+    labelKey: 'codeCard.background.green',
+    value: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+  },
+  {
+    labelKey: 'codeCard.background.purple',
+    value: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)'
+  }
 ]

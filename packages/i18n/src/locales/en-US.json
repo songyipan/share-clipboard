@@ -45,6 +45,7 @@
     "preview": "Preview",
     "edit": "Edit",
     "codeCard": "Share Card",
+    "plainText": "Plain text",
     "hidePreview": "Hide preview",
     "showPreview": "Show preview"
   },
@@ -52,5 +53,19 @@
     "dragToMove": "Drag to move",
     "closeFloatingBall": "Close floating ball",
     "close": "Close"
+  },
+  "codeCard": {
+    "windowTheme": {
+      "none": "None",
+      "macos": "macOS",
+      "windows": "Windows"
+    },
+    "background": {
+      "default": "Default",
+      "blue": "Blue",
+      "red": "Red",
+      "green": "Green",
+      "purple": "Purple"
+    }
   }
 }

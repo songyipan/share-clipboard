@@ -1,5 +1,13 @@
-export const PROGRAMMING_LANGUAGES = [
-  { value: 'plaintext', label: '纯文本' },
+import type { I18nKey } from '@share-clipboard/i18n'
+
+export type ProgrammingLanguageOption = {
+  value: string
+  label?: string
+  labelKey?: I18nKey
+}
+
+export const PROGRAMMING_LANGUAGES: ProgrammingLanguageOption[] = [
+  { value: 'plaintext', labelKey: 'panel.plainText' },
   { value: 'javascript', label: 'JavaScript' },
   { value: 'typescript', label: 'TypeScript' },
   { value: 'jsx', label: 'JSX' },
