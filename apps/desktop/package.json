@@ -14,7 +14,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "pnpm run db:generate && npm run typecheck:node && npm run typecheck:web",
     "start": "node scripts/run-electron-vite.mjs preview",
-    "dev": "node scripts/run-electron-vite.mjs dev",
+    "dev": "pnpm run db:generate && node scripts/run-electron-vite.mjs dev",
     "build": "pnpm run db:generate && npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
