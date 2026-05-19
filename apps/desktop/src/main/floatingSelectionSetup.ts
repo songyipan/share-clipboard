@@ -1,7 +1,6 @@
 import { shell, ipcMain } from 'electron'
 import {
   createFloatingWindow,
-  showFloatingWindow,
   hideFloatingWindow,
   loadFloatingWindowContent,
   getFloatingWindow,
@@ -16,20 +15,35 @@ import {
   getPanelWindow,
   getCurrentPanelType
 } from './panelWindow'
+import { getCursorPosition } from './mouseListener'
 import {
-  startSelectionListener,
-  getCursorPosition,
-  isListenerActive,
-  getCurrentShortcut
-} from './mouseListener'
-import { captureSelection, SelectionResult } from './selection'
+  getAppPreferences,
+  getConfiguredShortcut,
+  initSelectionListenerManager,
+  isSelectionListenerActive,
+  updateAppPreferences,
+  reapplySelectionListeners
+} from './selectionListenerManager'
+import { captureSelection, type SelectionResult } from './selection'
+import { createSelectionTriggerFlow } from './selectionTriggerFlow'
 import { IPC_CHANNELS } from '../shared/ipc'
 import { bootstrapNotebookSubsystem } from './notes/notebookSubsystem'
+import {
+  getSystemPermissionStatus,
+  openSystemPermissionSettings,
+  requestSystemPermission
+} from './systemPermission'
 
-let lastSelectionText = ''
-let lastTriggerTime = 0
 let isFloatingRendererReady = false
 let pendingSelectionResult: SelectionResult | null = null
+
+const selectionFlow = createSelectionTriggerFlow({
+  sendSelectionResultToPanel: (result) => sendSelectionResultToPanel(result),
+  onSelectionCaptured: (result) => {
+    pendingSelectionResult = result
+    flushPendingSelectionResult()
+  }
+})
 
 function initializeFloatingBall(): void {
   createFloatingWindow().webContents.on('did-start-loading', () => {
@@ -54,32 +68,15 @@ function initializeFloatingBall(): void {
     }, 300)
   })
 
-  startSelectionListener(handleSelectionTrigger)
+  initSelectionListenerManager((source, position) =>
+    selectionFlow.handleSelectionTrigger(source, position)
+  )
 }
 
 function sendSelectionResultToPanel(result: SelectionResult): void {
   const panelWindow = getPanelWindow()
   if (!panelWindow || panelWindow.isDestroyed()) return
   panelWindow.webContents.send(IPC_CHANNELS.SELECTION_RESULT, result)
-}
-
-async function handleSelectionTrigger(): Promise<void> {
-  const now = Date.now()
-  const position = getCursorPosition()
-  const result = await captureSelection()
-
-  if (result.success) {
-    if (now - lastTriggerTime < 300) {
-      return
-    }
-    lastTriggerTime = now
-
-    lastSelectionText = result.text || ''
-    sendSelectionResultToPanel(result)
-    pendingSelectionResult = result
-    showFloatingWindow(position.x, position.y)
-    flushPendingSelectionResult()
-  }
 }
 
 function notifyRenderer(result: SelectionResult): boolean {
@@ -109,11 +106,10 @@ function assertOpenableExternalUrl(url: string): string {
 
 function registerIpcHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.FLOATING_SHOW, () => {
-    const position = getCursorPosition()
-    showFloatingWindow(position.x, position.y)
+    void selectionFlow.handleSelectionTrigger('shortcut', getCursorPosition())
   })
 
-  ipcMain.handle(IPC_CHANNELS.SELECTION_LAST, () => lastSelectionText)
+  ipcMain.handle(IPC_CHANNELS.SELECTION_LAST, () => selectionFlow.getLastSelectionText())
 
   ipcMain.handle(IPC_CHANNELS.FLOATING_HIDE, () => {
     hideFloatingWindow()
@@ -131,8 +127,22 @@ function registerIpcHandlers(): void {
     return captureSelection()
   })
 
-  ipcMain.handle(IPC_CHANNELS.LISTENER_STATUS, () => isListenerActive())
-  ipcMain.handle(IPC_CHANNELS.LISTENER_SHORTCUT, () => getCurrentShortcut())
+  ipcMain.handle(IPC_CHANNELS.LISTENER_STATUS, () => isSelectionListenerActive())
+  ipcMain.handle(IPC_CHANNELS.LISTENER_SHORTCUT, () => getConfiguredShortcut())
+  ipcMain.handle(IPC_CHANNELS.PREFERENCES_GET, () => getAppPreferences())
+  ipcMain.handle(IPC_CHANNELS.PREFERENCES_SET, (_event, patch) => updateAppPreferences(patch))
+  ipcMain.handle(IPC_CHANNELS.PERMISSION_STATUS, () => getSystemPermissionStatus())
+  ipcMain.handle(IPC_CHANNELS.PERMISSION_REQUEST, () => {
+    const status = requestSystemPermission()
+    if (status.granted) reapplySelectionListeners()
+    return status
+  })
+  ipcMain.handle(IPC_CHANNELS.PERMISSION_OPEN_SETTINGS, async () => {
+    await openSystemPermissionSettings()
+    const status = getSystemPermissionStatus()
+    if (status.granted) reapplySelectionListeners()
+    return status
+  })
 
   ipcMain.handle(IPC_CHANNELS.EXTERNAL_OPEN, async (_event, url: string) => {
     await shell.openExternal(assertOpenableExternalUrl(url))
@@ -158,9 +168,10 @@ function registerIpcHandlers(): void {
     if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
       const [x, y] = floatingWindow.getPosition()
       showPanelWindow(x, y, type)
-      if (lastSelectionText) {
+      const text = selectionFlow.getLastSelectionText()
+      if (text) {
         setTimeout(() => {
-          sendSelectionResultToPanel({ success: true, text: lastSelectionText })
+          sendSelectionResultToPanel({ success: true, text })
         }, 100)
       }
     }

@@ -9,7 +9,7 @@ export interface NotebookWorkspaceHandlers {
   selectNote: (id: string | null) => Promise<void>
   changeDraftTitle: (title: string) => void
   changeDraftBody: (body: string) => void
-  addNote: () => Promise<void>
+  addNote: (initialBody?: string) => Promise<void>
   removeActiveNote: () => Promise<boolean>
   refreshNotes: () => Promise<void>
   flushNow: () => Promise<void>

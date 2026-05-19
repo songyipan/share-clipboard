@@ -6,26 +6,11 @@ import {
   CardHeader,
   CardTitle
 } from '@share-clipboard/ui/components/card'
-import { Label } from '@share-clipboard/ui/components/label'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@share-clipboard/ui/components/select'
 import { useI18n, isLanguage } from '@share-clipboard/i18n'
 import { type Theme, useTheme, isTheme } from '@share-clipboard/ui/theme'
 
-interface PreferenceSelectProps {
-  id: string
-  icon: React.ReactNode
-  label: string
-  value: string
-  options: { value: string; label: string }[]
-  onValueChange: (value: string) => void
-}
+import { PreferenceSelect } from '../components/settings/PreferenceSelect'
+import { TriggerSettingsSection } from '../components/settings/TriggerSettingsSection'
 
 export function MainAppSettingsPanel(): React.JSX.Element {
   const { language, setLanguage, t } = useI18n()
@@ -68,40 +53,9 @@ export function MainAppSettingsPanel(): React.JSX.Element {
             if (isTheme(value)) setTheme(value)
           }}
         />
+        <TriggerSettingsSection />
       </CardContent>
     </Card>
-  )
-}
-
-function PreferenceSelect({
-  id,
-  icon,
-  label,
-  value,
-  options,
-  onValueChange
-}: PreferenceSelectProps): React.JSX.Element {
-  return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <Label htmlFor={id} className="flex items-center gap-2">
-        {icon}
-        {label}
-      </Label>
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger id={id} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
   )
 }
 

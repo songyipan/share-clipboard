@@ -4,7 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import { disconnectNotebookPrisma } from './db/notebookPrisma'
-import { stopSelectionListener } from './mouseListener'
+import { stopAutoSelectionListener } from './autoSelectionListener'
+import { stopShortcutListener } from './shortcutListener'
 import { createTray, destroyTray } from './tray'
 import { registerIpcAndStartFloatingBall } from './floatingSelectionSetup'
 
@@ -59,7 +60,13 @@ function showMainWindow(): void {
   }
 }
 
+function stopAllSelectionListeners(): void {
+  stopAutoSelectionListener()
+  stopShortcutListener()
+}
+
 app.on('will-quit', () => {
+  stopAllSelectionListeners()
   void disconnectNotebookPrisma()
 })
 
@@ -83,7 +90,7 @@ app.whenReady().then(async () => {
 })
 
 app.on('window-all-closed', () => {
-  stopSelectionListener()
+  stopAllSelectionListeners()
   destroyTray()
 
   if (process.platform !== 'darwin') {

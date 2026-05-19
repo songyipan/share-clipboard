@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useSelectionResult } from '../../hooks/useSelectionResult'
 import { useFloatingBallHidden } from '../../hooks/useFloatingBallHidden'
+import { useFloatingBallShown } from '../../hooks/useFloatingBallShown'
 import { useResizeWindow } from '../../hooks/useResizeWindow'
 import { FloatingBallContainer } from './FloatingBallContainer'
 import type { PanelType } from '../../utils/panel'
@@ -9,7 +9,7 @@ export function FloatingBall(): React.JSX.Element | null {
   const [visible, setVisible] = useState<boolean>(false)
   const containerRef = useResizeWindow(visible)
 
-  useSelectionResult(() => setVisible(true))
+  useFloatingBallShown(() => setVisible(true))
   useFloatingBallHidden(() => setVisible(false))
 
   const handleAction = (type: PanelType): void => {

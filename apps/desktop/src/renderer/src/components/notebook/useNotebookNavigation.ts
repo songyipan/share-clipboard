@@ -18,7 +18,7 @@ interface NotebookNavigationArgs {
 
 export function useNotebookNavigation(params: NotebookNavigationArgs): {
   selectNote: (nextId: string | null) => Promise<void>
-  addNote: () => Promise<void>
+  addNote: (initialBody?: string) => Promise<void>
   removeActiveNote: () => Promise<boolean>
   flushNow: () => Promise<void>
 } {
@@ -41,17 +41,21 @@ export function useNotebookNavigation(params: NotebookNavigationArgs): {
     [clearTimer, persistNow, setActiveId]
   )
 
-  const addNote = useCallback(async () => {
-    await notebookCreateFresh({
-      clearTimer,
-      persistNow,
-      refreshNotes,
-      setActiveId,
-      baselineRef,
-      setDraftTitle,
-      setDraftBody
-    })
-  }, [baselineRef, clearTimer, persistNow, refreshNotes, setActiveId, setDraftBody, setDraftTitle])
+  const addNote = useCallback(
+    async (initialBody?: string) => {
+      await notebookCreateFresh({
+        clearTimer,
+        persistNow,
+        refreshNotes,
+        setActiveId,
+        baselineRef,
+        setDraftTitle,
+        setDraftBody,
+        initialBody
+      })
+    },
+    [baselineRef, clearTimer, persistNow, refreshNotes, setActiveId, setDraftBody, setDraftTitle]
+  )
 
   const removeActiveNote = useCallback(async (): Promise<boolean> => {
     if (!activeId) return false

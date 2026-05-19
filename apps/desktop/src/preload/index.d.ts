@@ -1,5 +1,7 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 
+import type { AppPreferences } from '../shared/appPreferences'
+import type { SystemPermissionStatus } from '../shared/systemPermission'
 import type {
   NoteDto,
   NoteExportResultDto,
@@ -29,7 +31,16 @@ interface FloatingBallAPI {
   resizePanelWindow: (width: number, height: number) => Promise<void>
   isListenerActive: () => Promise<boolean>
   getCurrentShortcut: () => Promise<string>
+  getAppPreferences: () => Promise<AppPreferences>
+  setAppPreferences: (
+    patch: Partial<AppPreferences>
+  ) => Promise<{ preferences: AppPreferences; applied: boolean }>
+  onPreferencesChanged: (callback: (preferences: AppPreferences) => void) => () => void
+  getSystemPermissionStatus: () => Promise<SystemPermissionStatus>
+  requestSystemPermission: () => Promise<SystemPermissionStatus>
+  openSystemPermissionSettings: () => Promise<void>
   onFloatingBallHidden: (callback: () => void) => () => void
+  onFloatingBallShown: (callback: () => void) => () => void
   onSelectionResult: (
     callback: (result: { success: boolean; text: string; error?: string }) => void
   ) => () => void

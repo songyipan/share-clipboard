@@ -21,10 +21,12 @@ export async function notebookCreateFresh(args: {
   baselineRef: MutableRefObject<NotebookDraft>
   setDraftTitle: (v: string) => void
   setDraftBody: (v: string) => void
+  initialBody?: string
 }): Promise<void> {
   args.clearTimer()
   await args.persistNow()
-  const created = await window.api.notes.create({})
+  const body = args.initialBody?.trim() ?? ''
+  const created = await window.api.notes.create(body ? { body } : {})
   await args.refreshNotes()
   args.setActiveId(created.id)
   args.baselineRef.current = { title: created.title, body: created.body }

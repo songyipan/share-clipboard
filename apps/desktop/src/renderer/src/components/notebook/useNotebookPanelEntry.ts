@@ -5,8 +5,14 @@ import type { TFunction } from '@share-clipboard/i18n'
 import type { NotebookEntryGateStep } from './NotebookEntryGate'
 import type { NotebookWorkspaceHandlers } from './notebookWorkspaceTypes'
 
+async function readSelectedText(fallback: string): Promise<string> {
+  const fromMain = (await window.api.getLastSelectedText()).trim()
+  return fromMain || fallback.trim()
+}
+
 export function useNotebookPanelEntry(
   nb: NotebookWorkspaceHandlers,
+  selectedText: string,
   t: TFunction
 ): {
   workspaceReady: boolean
@@ -20,7 +26,7 @@ export function useNotebookPanelEntry(
   onSaveToList: () => Promise<void>
 } {
   const [workspaceReady, setWorkspaceReady] = useState(false)
-  const [gateStep, setGateStep] = useState<NotebookEntryGateStep>('later')
+  const [gateStep, setGateStep] = useState<NotebookEntryGateStep>('choice')
   const [remark, setRemark] = useState('')
   const [gateBusy, setGateBusy] = useState(false)
 
@@ -28,7 +34,8 @@ export function useNotebookPanelEntry(
     setGateBusy(true)
     void (async () => {
       try {
-        await nb.addNote()
+        const body = await readSelectedText(selectedText)
+        await nb.addNote(body || undefined)
         setWorkspaceReady(true)
       } finally {
         setGateBusy(false)
@@ -41,7 +48,8 @@ export function useNotebookPanelEntry(
     try {
       await nb.selectNote(null)
       const title = remark.trim() || t('panel.quickNoteDefaultTitle')
-      await window.api.notes.create({ title, body: '' })
+      const body = await readSelectedText(selectedText)
+      await window.api.notes.create({ title, body })
       await nb.refreshNotes()
       setRemark('')
       setGateStep('choice')

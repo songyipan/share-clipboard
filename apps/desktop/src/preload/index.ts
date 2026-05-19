@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 import { IPC_CHANNELS } from '../shared/ipc'
+import type { AppPreferences } from '../shared/appPreferences'
+import type { SystemPermissionStatus } from '../shared/systemPermission'
 import type {
   NoteDto,
   NoteExportResultDto,
@@ -40,11 +42,36 @@ const api = {
   // 监听器状态
   isListenerActive: () => ipcRenderer.invoke(IPC_CHANNELS.LISTENER_STATUS),
   getCurrentShortcut: () => ipcRenderer.invoke(IPC_CHANNELS.LISTENER_SHORTCUT),
+  getAppPreferences: (): Promise<AppPreferences> =>
+    ipcRenderer.invoke(IPC_CHANNELS.PREFERENCES_GET),
+  setAppPreferences: (
+    patch: Partial<AppPreferences>
+  ): Promise<{ preferences: AppPreferences; applied: boolean }> =>
+    ipcRenderer.invoke(IPC_CHANNELS.PREFERENCES_SET, patch),
+  getSystemPermissionStatus: (): Promise<SystemPermissionStatus> =>
+    ipcRenderer.invoke(IPC_CHANNELS.PERMISSION_STATUS),
+  requestSystemPermission: (): Promise<SystemPermissionStatus> =>
+    ipcRenderer.invoke(IPC_CHANNELS.PERMISSION_REQUEST),
+  openSystemPermissionSettings: (): Promise<void> =>
+    ipcRenderer.invoke(IPC_CHANNELS.PERMISSION_OPEN_SETTINGS),
+  onPreferencesChanged: (callback: (preferences: AppPreferences) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, preferences: AppPreferences): void => {
+      callback(preferences)
+    }
+    ipcRenderer.on(IPC_CHANNELS.PREFERENCES_CHANGED, handler)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.PREFERENCES_CHANGED, handler)
+  },
 
   // 监听悬浮球隐藏事件
   onFloatingBallHidden: (callback: () => void) => {
     ipcRenderer.on(IPC_CHANNELS.FLOATING_HIDDEN, callback)
     return () => ipcRenderer.removeListener(IPC_CHANNELS.FLOATING_HIDDEN, callback)
+  },
+
+  onFloatingBallShown: (callback: () => void) => {
+    const handler = (): void => callback()
+    ipcRenderer.on(IPC_CHANNELS.FLOATING_SHOWN, handler)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.FLOATING_SHOWN, handler)
   },
 
   onSelectionResult: (callback: (result: SelectionResultPayload) => void) => {

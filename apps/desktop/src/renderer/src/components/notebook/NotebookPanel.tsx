@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import type { TFunction } from '@share-clipboard/i18n'
@@ -20,16 +20,12 @@ export function NotebookPanel(): React.JSX.Element {
   const { t } = useI18n()
   const lastSelectedText = useSelectedText()
   const nb = useNotebookWorkspace()
-  const entry = useNotebookPanelEntry(nb, t)
+  const entry = useNotebookPanelEntry(nb, lastSelectedText, t)
   const [previewOpen, setPreviewOpen] = useState(true)
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>('light')
   const isDark = useDarkMode()
 
-  const previewSource = useMemo(
-    () => (nb.activeId ? nb.draftBody : ''),
-    [nb.activeId, nb.draftBody]
-  )
-  const canInsertSelection = !!lastSelectedText.trim()
+  const canInsertSelection = lastSelectedText.trim().length > 0
   const colorMode = previewOpen ? previewTheme : isDark ? 'dark' : 'light'
 
   const exports = useNotebookExportActions(
@@ -65,8 +61,9 @@ export function NotebookPanel(): React.JSX.Element {
           setPreviewTheme={setPreviewTheme}
           exportHint={exports.exportHint}
           canInsertSelection={canInsertSelection}
-          previewSource={previewSource}
+          previewSource={nb.activeId ? nb.draftBody : ''}
           t={t}
+          onNewNote={() => void nb.addNote(lastSelectedText.trim() || undefined)}
           onExportPdf={() => void exports.exportPdf()}
           onExportDocx={() => void exports.exportDocx()}
           onInsertSelection={exports.insertSelection}
@@ -100,6 +97,7 @@ interface NotebookMainColumnProps {
   canInsertSelection: boolean
   previewSource: string
   t: TFunction
+  onNewNote: () => void
   onExportPdf: () => void
   onExportDocx: () => void
   onInsertSelection: () => void
@@ -115,6 +113,7 @@ function NotebookMainColumn({
   canInsertSelection,
   previewSource,
   t,
+  onNewNote,
   onExportPdf,
   onExportDocx,
   onInsertSelection
@@ -130,7 +129,7 @@ function NotebookMainColumn({
         saving={nb.saving}
         draftTitle={nb.draftTitle}
         onDraftTitleChange={nb.changeDraftTitle}
-        onNewNote={() => void nb.addNote()}
+        onNewNote={onNewNote}
         onDeleteNote={() => void nb.removeActiveNote()}
         onExportPdf={onExportPdf}
         onExportDocx={onExportDocx}

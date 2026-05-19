@@ -44,7 +44,8 @@
     "react-dom": "^19.2.1",
     "react-router-dom": "^7.15.0",
     "remark-breaks": "^4.0.0",
-    "shiki": "^4.0.2"
+    "shiki": "^4.0.2",
+    "uiohook-napi": "^1.5.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

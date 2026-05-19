@@ -18,8 +18,8 @@ export function createFloatingWindow(): BrowserWindow {
   }
 
   floatingWindow = new BrowserWindow({
-    width: 1,
-    height: 1,
+    width: 220,
+    height: 52,
     frame: false,
     transparent: true,
     alwaysOnTop: true,

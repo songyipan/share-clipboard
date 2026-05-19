@@ -113,22 +113,22 @@ function NotebookEntryGateFooter(props: {
         <>
           <Button
             type="button"
+            size="sm"
             variant="outline"
+            className="w-full sm:w-auto"
+            onClick={onEditNow}
+            disabled={busy}
+          >
+            {t('panel.notebookEditNow')}
+          </Button>
+          <Button
+            type="button"
             size="sm"
             className="w-full sm:w-auto"
             onClick={onEditLater}
             disabled={busy}
           >
             {t('panel.notebookEditLater')}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            className="w-full sm:w-auto"
-            onClick={onEditNow}
-            disabled={busy}
-          >
-            {t('panel.notebookEditNow')}
           </Button>
         </>
       ) : (
