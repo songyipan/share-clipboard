@@ -1,4 +1,4 @@
-import { shell, ipcMain } from 'electron'
+import { shell, ipcMain, BrowserWindow, screen, type WebContents } from 'electron'
 import {
   createFloatingWindow,
   hideFloatingWindow,
@@ -162,18 +162,15 @@ function registerIpcHandlers(): void {
     }
   })
 
-  ipcMain.handle(IPC_CHANNELS.PANEL_SHOW, (_event, type: string) => {
+  ipcMain.handle(IPC_CHANNELS.PANEL_SHOW, (event, type: string) => {
     console.log('[Main] panel:show received, type:', type)
-    const floatingWindow = getFloatingWindow()
-    if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
-      const [x, y] = floatingWindow.getPosition()
-      showPanelWindow(x, y, type)
-      const text = selectionFlow.getLastSelectionText()
-      if (text) {
-        setTimeout(() => {
-          sendSelectionResultToPanel({ success: true, text })
-        }, 100)
-      }
+    const { x, y } = resolvePanelAnchor(event.sender)
+    showPanelWindow(x, y, type)
+    const text = selectionFlow.getLastSelectionText()
+    if (text) {
+      setTimeout(() => {
+        sendSelectionResultToPanel({ success: true, text })
+      }, 100)
     }
   })
 
@@ -182,6 +179,23 @@ function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC_CHANNELS.PANEL_CURRENT, () => getCurrentPanelType())
+}
+
+function resolvePanelAnchor(sender: WebContents): { x: number; y: number } {
+  const floatingWindow = getFloatingWindow()
+  if (floatingWindow && !floatingWindow.isDestroyed() && floatingWindow.isVisible()) {
+    const [x, y] = floatingWindow.getPosition()
+    return { x, y }
+  }
+
+  const callerWindow = BrowserWindow.fromWebContents(sender)
+  if (callerWindow && !callerWindow.isDestroyed()) {
+    const bounds = callerWindow.getBounds()
+    return { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 }
+  }
+
+  const { x, y, width, height } = screen.getPrimaryDisplay().workArea
+  return { x: x + width / 2, y: y + height / 2 }
 }
 
 export async function registerIpcAndStartFloatingBall(): Promise<void> {

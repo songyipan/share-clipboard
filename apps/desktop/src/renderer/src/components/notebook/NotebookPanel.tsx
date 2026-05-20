@@ -16,11 +16,11 @@ import { useNotebookWorkspace } from './useNotebookWorkspace'
 import { NotebookWorkspaceEditor } from './NotebookWorkspaceEditor'
 import type { NotebookWorkspaceHandlers } from './notebookWorkspaceTypes'
 
-export function NotebookPanel(): React.JSX.Element {
+export function NotebookPanel({ skipEntryGate = false }: { skipEntryGate?: boolean }): React.JSX.Element {
   const { t } = useI18n()
   const lastSelectedText = useSelectedText()
   const nb = useNotebookWorkspace()
-  const entry = useNotebookPanelEntry(nb, lastSelectedText, t)
+  const entry = useNotebookPanelEntry(nb, lastSelectedText, t, { skipEntryGate })
   const [previewOpen, setPreviewOpen] = useState(true)
   const [previewTheme, setPreviewTheme] = useState<PreviewTheme>('light')
   const isDark = useDarkMode()
@@ -39,10 +39,12 @@ export function NotebookPanel(): React.JSX.Element {
 
   return (
     <div className="relative w-full h-full flex flex-col bg-background" data-color-mode={colorMode}>
-      <div
-        className="flex items-center h-10 px-3 pt-2 shrink-0"
-        style={{ WebkitAppRegion: 'drag' } as CSSProperties}
-      />
+      {!skipEntryGate ? (
+        <div
+          className="flex items-center h-10 px-3 pt-2 shrink-0"
+          style={{ WebkitAppRegion: 'drag' } as CSSProperties}
+        />
+      ) : null}
       <div className="flex-1 flex min-h-0 px-3 pb-3 gap-2">
         <aside className="w-36 shrink-0 flex flex-col border border-border rounded-md p-2 min-h-0">
           <NotebookNoteList
@@ -70,7 +72,7 @@ export function NotebookPanel(): React.JSX.Element {
         />
       </div>
 
-      {!entry.workspaceReady ? (
+      {!skipEntryGate && !entry.workspaceReady ? (
         <NotebookEntryGate
           step={entry.gateStep}
           remark={entry.remark}

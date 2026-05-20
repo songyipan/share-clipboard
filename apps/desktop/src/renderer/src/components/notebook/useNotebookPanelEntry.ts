@@ -13,7 +13,8 @@ async function readSelectedText(fallback: string): Promise<string> {
 export function useNotebookPanelEntry(
   nb: NotebookWorkspaceHandlers,
   selectedText: string,
-  t: TFunction
+  t: TFunction,
+  options?: { skipEntryGate?: boolean }
 ): {
   workspaceReady: boolean
   gateStep: NotebookEntryGateStep
@@ -25,7 +26,7 @@ export function useNotebookPanelEntry(
   onBackFromLater: () => void
   onSaveToList: () => Promise<void>
 } {
-  const [workspaceReady, setWorkspaceReady] = useState(false)
+  const [workspaceReady, setWorkspaceReady] = useState(options?.skipEntryGate ?? false)
   const [gateStep, setGateStep] = useState<NotebookEntryGateStep>('choice')
   const [remark, setRemark] = useState('')
   const [gateBusy, setGateBusy] = useState(false)

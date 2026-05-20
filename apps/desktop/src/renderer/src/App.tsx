@@ -17,6 +17,11 @@ const PanelPage = lazy(async () => {
   return { default: m.PanelPage }
 })
 
+const NotebookPage = lazy(async () => {
+  const m = await import('./pages/NotebookPage')
+  return { default: m.NotebookPage }
+})
+
 function App(): React.JSX.Element {
   return (
     <AppPreferencesProvider>
@@ -24,6 +29,7 @@ function App(): React.JSX.Element {
         <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<MainApp />} />
+            <Route path="/notebook" element={<NotebookPage />} />
             <Route path="/floating" element={<FloatingBallPage />} />
             <Route path="/panel" element={<PanelPage />} />
           </Routes>
